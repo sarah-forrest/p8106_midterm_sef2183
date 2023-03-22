@@ -1,0 +1,59 @@
+---
+title: "P8106 Data Science II Midterm Project Report: Predicting COVID-19 Recovery Time and Identifying Important Risk Factors"
+author: "Sarah Forrest - sef2183"
+date: "4/5/2023"
+output: github_document
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, message = FALSE, warning = FALSE, dpi = 300, fig.width = 7)
+```
+
+```{r, include = FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+```
+
+# Background
+
+To gain a better understanding of the factors that predict recovery time from COVID-19 illness, a study was designed to combine three existing cohort studies that have been tracking participants for several years. The study collects recovery information through questionnaires and medical records, and leverages existing data on personal characteristics prior to the pandemic. The ultimate goal is to develop a prediction model for recovery time and identify important risk factors for long recovery time.
+
+# Data
+
+This project uses the "recovery.RData" file, which consists of 10000 participants. A random sample of 2000 participants is used for this analysis using a seed set to my UNI number (2183).
+
+```{r}
+set.seed(2183) # my UNI
+
+# create a random sample of 2000 participants
+dat <- dat[sample(1:10000, 2000),] 
+```
+
+# Exploratory analysis and data visualization:
+
+In this section, use appropriate visualization techniques to explore the dataset and identify any patterns or relationships in the data.
+
+```{r}
+```
+
+ 
+
+# Model training:
+
+In this section, describe the models you used for predicting time to recovery from COVID-19. State the assumptions made by using the models. Provide a detailed description of the model training procedure and how you obtained the final model.
+
+```{r}
+```
+
+# Results:
+
+In this section, report the final model that you built for predicting time to recovery from COVID-19. Interpret the results. Assess the model's training/test performance.
+
+```{r}
+```
+
+# Conclusions:
+
+In this section, summarize your findings from the model analysis and discuss the insights gained into predicting time to recovery from COVID-19.
+
+```{r}
+```
