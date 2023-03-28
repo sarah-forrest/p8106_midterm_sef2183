@@ -318,7 +318,7 @@ bwplot(resamp,
        main = "Figure 2. Model Comparison Plot Using RMSE")
 ```
 
-According to Figure 2, the lasso model had the highest median training RMSE (i.e., worst performance), followed by the GAM using select predictors, the pls model, the linear model, the elastic net model, the GAM using all predictors, and finally, The MARS model, which had the lowest median training RMSE (i.e., best performance).
+According to Figure 2, the lasso model had the highest median training RMSE (i.e., worst performance), followed by the GAM using select predictors, the linear model, the pls model, the elastic net model, the GAM using all predictors, and finally, The MARS model, which had the lowest median training RMSE (i.e., best performance).
 
 The final model for predicting time to recovery from COVID-19 was selected by comparing the median training RMSE for all models created. The MARS model had the lowest value for mean and median RMSE out of all models, however, it only contained 4 terms with 2 of the predictors. A model with so few predictors would not be an ideal model for predicting recovery time and comprehensively identifying important risk factors for long recovery time, as so few risk factors were included. Therefore, the GAM model will all predictors--the second best model in terms of mean and median RMSE--was selected as the final model for predicting time to recovery from COVID-19 in this study.
 

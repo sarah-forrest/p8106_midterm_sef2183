@@ -446,11 +446,9 @@ RMSE indicates the worst performing model (high prediction error).
 
 According to Figure 2, the lasso model had the highest median training
 RMSE (i.e., worst performance), followed by the GAM using select
-predictors, the pls model, the linear model, the elastic net model, the
+predictors, the linear model, the pls model, the elastic net model, the
 GAM using all predictors, and finally, The MARS model, which had the
 lowest median training RMSE (i.e., best performance).
-
-# Results
 
 The final model for predicting time to recovery from COVID-19 was
 selected by comparing the median training RMSE for all models created.
@@ -463,12 +461,14 @@ GAM model will all predictors–the second best model in terms of mean and
 median RMSE–was selected as the final model for predicting time to
 recovery from COVID-19 in this study.
 
+# Results
+
 **Model formula**
 
-The final model formula uses the `recovery_time` variable as the outcome
-(Y), and the following terms as predictors. Note that “White” (`race` =
-0) was set as the reference category for the `race` variable, “Never
-Smoker” (`smoking` = 0) was set as the reference category for the
+The final GAM model formula uses the `recovery_time` variable as the
+outcome (Y), and the following terms as predictors. Note that “White”
+(`race` = 0) was set as the reference category for the `race` variable,
+“Never Smoker” (`smoking` = 0) was set as the reference category for the
 `smoking` variable, and “Study A” (`study` = A) was set as the reference
 category for the `study` variable. An s() around the variable name
 indicates that a smoothing function was applied to the variable. An
@@ -532,7 +532,7 @@ significant at the 5% level of significance.
     associated with a 4.2338-day longer predicted recovery time than
     study A.
 
-<!-- -->
+**Model performance**
 
     ## [1] 24.37900 24.41081
 
