@@ -1,5 +1,5 @@
 ---
-title: "P8106 Data Science II Midterm Project Code: Predicting COVID-19 Recovery Time and Identifying Important Risk Factors"
+title: "P8106 Data Science II Midterm Project Report: Predicting COVID-19 Recovery Time and Identifying Important Risk Factors"
 author: "Sarah Forrest - sef2183"
 date: "4/5/2023"
 output: github_document
