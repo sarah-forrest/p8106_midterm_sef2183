@@ -21,27 +21,17 @@ header-includes:
 \newpage
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(collapse = TRUE, include = FALSE, message = FALSE, warning = FALSE, dpi = 300, fig.width = 7)
+knitr::opts_chunk$set(collapse = TRUE, message = FALSE, warning = FALSE, dpi = 300, fig.width = 7)
 ```
 
-```{r, message=FALSE, warning=FALSE}
+```{r, include = FALSE}
 library(tidyverse)
 library(caret)
 library(mgcv)
 library(earth)
 ```
 
-# Background
-
-To gain a better understanding of the factors that predict recovery time from COVID-19 illness, this study was designed to combine three existing cohort studies that have been tracking participants for several years. This study collects recovery information through questionnaires and medical records, and leverages existing data on personal characteristics prior to the pandemic. The ultimate goal is to develop a prediction model for recovery time and identify important risk factors for long recovery time.
-
-# Data
-
-This study uses data from the `recovery.RData` file. The dataset contains a variable for the time from COVID-19 infection to recovery (in days), which is the outcome of interest in this study. It also contains 14 predictor variables, including demographic characteristics, personal characteristics, vital measurements, and disease status. The predictors are a mix of continuous and categorical variables. 
-
-The `recovery.RData` file consists of data on 10000 participants. A random sample of 2000 participants was used for analysis. Additionally, the random sample of 2000 participants was further split into training and test datasets using the `createDataPartition()` function in R. The training dataset contained 70% of the sample and the test dataset contained the remaining 30%. All data partitions were conducted using a seed set to my UNI number (2183) for reproducibility. 
-
-```{r}
+```{r, include = FALSE}
 set.seed(2183) # for reproducibility - my UNI
 
 # read in dataset
@@ -72,11 +62,12 @@ x2 <- model.matrix(recovery_time~.,dat)[-trRows,-1]
 y2 <- dat$recovery_time[-trRows]
 ```
 
-# Exploratory Analysis and Data Visualization:
+# Data
+The dataset used in this study contains a variable for the time from COVID-19 infection to recovery (in days), which is the outcome of interest. It also contains 14 predictor variables, including demographic characteristics, personal characteristics, vital measurements, and disease status. The predictors are a mix of continuous and categorical variables. While the dataset consists of 10000 participants, a random sample of 2000 was used for analysis. Additionally, the sample was further split into training (70%) and test (30%) datasets using the `createDataPartition()` function. All data partitions were conducted using a seed set to my UNI number (2183) for reproducibility. 
 
-Lattice plots were created using the `featurePlot()` function in the caret package to explore the multivariate dataset and identify patterns or relationships. A plot is created for each of the 14 predictors in the dataset in order to visualize each predictor's association with the outcome, COVID-19 recovery time.
+# Exploratory Analysis and Data Visualization
 
-```{r}
+```{r, include = FALSE}
 # create dataset for exploratory analysis and data visualization
 dat_train_viz <- dat_train %>%
   mutate(study = case_when( # turn study (character variable) into a numeric variable
@@ -89,9 +80,7 @@ non_numeric_cols <- sapply(dat_train_viz, function(x) !is.numeric(x))
 
 # Convert non-numeric columns to numeric
 dat_train_viz[, non_numeric_cols] <- lapply(dat_train_viz[, non_numeric_cols], as.numeric) # turn factor variables into numeric variables
-```
 
-```{r}
 # set various graphical parameters (color, line type, background, etc) to control the look of trellis displays
 theme1 <- trellis.par.get()
 theme1$plot.symbol$col <- rgb(.2, .4, .2, .5)
@@ -100,51 +89,29 @@ theme1$plot.line$col <- rgb(.8, .1, .1, 1)
 theme1$plot.line$lwd <- 2
 theme1$strip.background$col <- rgb(.0, .2, .6, .2)
 trellis.par.set(theme1)
-
-featurePlot(x = dat_train_viz[ ,1:14],
-            y = dat_train_viz[ ,15],
-            plot = "scatter",
-            span = .5,
-            labels = c("Predictors (Xs)", "COVID-19 Recovery Time (Y)"),
-            main = "Figure 1. Lattice Plot",
-            type = c("p", "smooth"))
 ```
 
-Using the lattice plot in Figure 1. the following patterns were observed: 
+Lattice plots were created using the `featurePlot()` function to visualize each potential predictor's association with the outcome, COVID-19 recovery time (see Figure 1 in the appendix). the following patterns were observed: 
 
-- Patient age does not appear to have a clear association with COVID-19 recovery time. The mostly straight horizontal line shows that both low and high values for age have similar values for recovery time. The age variable appears to be normally distributed, with most data points in the middle between the minimum age (42) and maximum age (79).
-- For the gender variable, male patients were assigned a value of 1 and female patients were assigned a value of 0. Therefore, the plot shows that males appear to have a longer recovery time than females in the dataset.
-- For the race variable, White patients were assigned a value of 1, Asian patients were assigned 2, Black patients were assigned 3, and Hispanic patients were assigned 4. The plot shows that White patients appear to have a shorter recovery time compared to all other races.
-- For the smoking variable, patients who never smoked were assigned a value of 0, former smokers were assigned 1, and current smokers were assigned 2. The plot shows that never smokers appear to have a shorter recovery time compared to former and current smokers. There is a positive association between smoking and recovery time.
-- A slight negative association can be observed between patient height and recovery time. Patients with lower height values (shorter patients) appear to have a slightly longer recovery time than patients with higher height values (taller patients). 
-- A slight positive association can be observed between patient weight and recovery time. Patients with lower weight values appear to have a slightly shorter recovery time than patients with higher weight values.
-- A slight U-shaped association can be observed between patient bmi and recovery time. Patients with bmi values near the minimum (19.2) and maximum (37.7) in the dataset have longer recovery times than patients with bmi values in the middle (25-30).
-- For the hypertension variable, patients without hypertension were assigned a value of 0 and patients with hypertension were assigned a value of 1. The plot shows that patients with hypertension appear to have a longer recovery time compared to patients without hypertension. There is a positive association between hypertension and recovery time.
-- For the diabetes variable, patients without diabetes were assigned a value of 0 and patients with diabetes were assigned a value of 1. The plot shows that patients with diabetes appear to have a longer recovery time compared to patients without diabetes. There is a positive association between diabetes and recovery time.
-- Patient systolic blood pressure (SBP) does not appear to have a clear association with recovery time. The mostly straight horizontal line shows that both low and high values for SBP have similar values for recovery time.
-- Patient LDL cholesterol does not appear to have a clear association with recovery time. The mostly straight horizontal line shows that both low and high values for LDL have similar values for recovery time.
-- For the vaccine variable, unvaccinated patients at the time of infection were assigned a value of 0 and vaccinated patients were assigned a value of 1. The plot shows that vaccinated patients appear to have a shorter recovery time compared to unvaccinated patients. There is a negative association between vaccination and recovery time.
-- For the severity variable, patients without severe COVID-19 infection were assigned a value of 0 and patients with severe COVID-19 infection were assigned a value of 1. The plot shows that patients with severe infections
-appear to have a longer recovery time compared to patients without severe infections. There is a positive association between severity and recovery time.
-- For the study variable, patients in study A were assigned a value of 1, patients in study B were assigned a value of 2, patients in study C were assigned a value of 3. The plot shows that patients in study B had a shorter recovery time compared to patients in studies A and C. 
-
+- Males appear to have a longer recovery time than females.
+- White patients appear to have a shorter recovery time compared to all other races.
+- Never smokers appear to have a shorter recovery time compared to former and current smokers.
+- Patients with lower height values appear to have a slightly longer recovery time than patients with higher height values.
+- Patients with lower weight values appear to have a slightly shorter recovery time than patients with higher weight values.
+- A slight U-shaped association can be observed between patient bmi and recovery time. Patients with bmi values near the min and max in the dataset have longer recovery times than patients with bmi values in the middle.
+- Patients with hypertension appear to have a longer recovery time compared to patients without hypertension. 
+- Patients with diabetes appear to have a longer recovery time compared to patients without diabetes.
+- Vaccinated patients appear to have a shorter recovery time compared to unvaccinated patients. 
+- Patients with severe infections appear to have a longer recovery time compared to patients without severe infections.
+- Patients in study B had a shorter recovery time compared to patients in studies A and C. 
+- The following variables do not appear to have a clear association with COVID-19 recovery time: patient age, SBP, and LDL cholesterol. 
 
 # Model Training
-
-Several different models were fit using all predictors to predict time to recovery from COVID-19. 
-
-The `train()` function from the caret package was used to fit each model using either the training dataset or a matrix of all the predictors and a vector of the response variable, `recovery_time`, from the training dataset as inputs. Each model was also fit using cross-validation with 10 folds repeated 5-times. The `trainControl()` function was used to specify this cross-validation method, which was called on within the `train()` function using the trControl argument. Additionally, the method argument was used within the `train()` function to specify the type of model to fit. The resulting model object for each model contains the final model (finalModel) and information about the cross-validation performance. 
-
-The `predict()` function from the caret package was also used to generate predictions for the test dataset using each final model that was trained using the training dataset. The root mean squared error (RMSE) between the predicted and actual recovery times on the test dataset was calculated in order to evaluate each model's performance and support model comparison.
-
-This approach results in a final model that has been trained using cross-validation, which can help to reduce overfitting and improve the generalization performance of the model on new, unseen data for future prediction purposes.
-
+Several different models were fit using all predictors to predict time to recovery from COVID-19. The `train()` function from the caret package was used to fit each model using either the training dataset or a matrix of all the predictors and a vector of the response variable, `recovery_time`, from the training dataset as inputs. Each model was also fit using cross-validation with 10 folds repeated 5-times. The `trainControl()` function was used to specify this cross-validation method, which was called on within the `train()` function using the trControl argument. Additionally, the method argument was used within the `train()` function to specify the type of model to fit. The resulting model object for each model contains the final model (finalModel) and information about the cross-validation performance. The `predict()` function from the caret package was also used to generate predictions for the test dataset using each final model that was trained using the training dataset. The root mean squared error (RMSE) between the predicted and actual recovery times on the test dataset was calculated in order to evaluate each model's performance and support model comparison.
 
 **1. Linear model**
-
 A linear model that assumes a linear relationship between the predictor and response variables (linearity), and assumes that the errors are normally distributed (normality) and have constant variance (homoscedasticity),and that the observations are independent of each other (independence). The linear model is the most basic and assumes a linear relationship between the variables, while the other models allow for more flexible relationships. A method = "lm" argument was used within the `train()` function to specify a linear model fit.
-
-```{r}
+```{r, include = FALSE}
 set.seed(2183)
 
 # 10-fold cross-validation repeated 5 times using the best rule
@@ -168,10 +135,8 @@ test_rmse
 ```
 
 **2. Lasso model**
-
 A lasso model is a linear regression model that adds a penalty term to the sum of absolute values of the coefficients to prevent overfitting, which can lead to sparse models by shrinking some coefficients to zero. It has the same assumptions as the linear model. A method = "glmnet" argument was used within the `train()` function to specify a lasso model fit. Additionally, a grid of tuning parameters for the model were set using the tuneGrid argument within the `train()` function. The grid contains 100 values of the lambda parameter, ranging from exp(-1) to exp(5) with equal intervals on the log scale. The alpha parameter is set to 1, indicating that we are only considering Lasso regularization. The `expand.grid()` function is used to generate all possible combinations of alpha and lambda in the grid for tuning.
-
-```{r}
+```{r, include = FALSE}
 set.seed(2183)
 
 lasso_model <- train(x, y, # training dataset
@@ -190,11 +155,8 @@ test_rmse
 ```
 
 **3. Elastic net model**
-
 An elastic net model is linear regression model that combines the penalties of the lasso and ridge regression methods to prevent overfitting, which can result in better prediction accuracy than either method alone. It has the same assumptions as the linear model. A method = "glmnet" argument was used within the `train()` function to specify a elastic net model fit. Additionally, a grid of tuning parameters for the model were set using the tuneGrid argument within the `train()` function. The grid includes 21 values of the alpha parameter, ranging from 0 to 1 with equal intervals. The lambda parameter is set to a sequence of 50 values, ranging from exp(2) to exp(-2) with equal intervals on the log scale. The expand.grid() function generates all possible combinations of alpha and lambda in the grid for tuning.
-
-
-```{r}
+```{r, include = FALSE}
 set.seed(2183)
 
 enet_model <- train(x, y, # training dataset
@@ -213,10 +175,8 @@ test_rmse
 ```
 
 **4. Partial least squares (PLS) model**
-
 A PLS model is a model that seeks to find a low-dimensional representation of the predictor variables that explains the maximum variance in the response variable. It has the same assumptions as the linear model as well as a latent variable assumption, the assumption that the predictor variables are linearly related to the response variable via a set of underlying latent variables. A method = "pls" argument was used within the `train()` function to specify a PLS model fit. Additionally, a tuning parameter for the model were set using the tuneGrid argument within the `train()` function. The tuneGrid object includes a data frame with a single column ncomp that ranges from 1 to 17, representing the number of components used in the model. The preProcess argument is set to "center" and "scale", which means that the training data will be centered and scaled prior to model fitting.
-
-```{r}
+```{r, include = FALSE}
 set.seed(2183)
 
 pls_model <- train(x, y, # training dataset
@@ -234,11 +194,9 @@ test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
 test_rmse
 ```
 
-**5. Generalized additive model (GAM)**
-
+**5. Generalized additive model (GAM) model**
 A GAM model is a model that extends the linear model by allowing for nonlinear relationships between the predictor and response variables, using flexible functions called splines. It has the same assumptions as the linear model. A method = "gam" argument was used within the `train()` function to specify a GAM fit. Additionally, two separate GAM models were fit: one GAM model using all predictors, and one GAM model with variable selection performed during model training. For the variable selection GAM model, a tuneGrid object was specified within the `train()` function. The tuneGrid object includes a data frame with two arguments: method is set to "GCV.Cp", which represents the generalized cross-validation with the Cp criterion for smoothing parameter selection, and select is set to TRUE, indicating that variable selection will be performed during model training.
-
-```{r}
+```{r, include = FALSE}
 set.seed(2183)
 
 # fit GAM model using all predictors
@@ -272,10 +230,8 @@ test_rmse
 ```
 
 **6. Multivariate adaptive regression spline (MARS) model**
-
 A MARS model is a model that uses piecewise linear or nonlinear functions to model the relationship between the predictor and response variables, which can capture complex nonlinear relationships. It has the same assumptions as the linear model. A method = "earth" argument was used within the `train()` function to specify a MARS model fit. Additionally, the `expand.grid()` function is used to generate a grid of tuning parameters. The mars_grid object includes two arguments: degree is set to 1, 2, and 3, representing the number of possible product hinge functions in a single term, and nprune is set to integers between 2 and 17, representing the upper bound on the number of terms in the model. The tuneGrid argument in the `train()` function uses the mars_grid object to specify the parameters for model tuning.
-
-```{r}
+```{r, include = FALSE}
 set.seed(2183)
 
 # create grid of all possible pairs that can take degree and nprune values
@@ -296,11 +252,51 @@ test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
 test_rmse
 ```
 
-**Model comparison**
 
-The models were assessed by comparing the RMSE for each model. Low RMSE indicates the best performing model (low prediction error), while high RMSE indicates the worst performing model (high prediction error). 
+The final model was selected by comparing the median training RMSE for all models (see Table 1 and Figure 2 in the appendix). The lasso model had the highest mean and median training RMSE (i.e., worst performance), and the MARS model had the lowest mean and median training RMSE (i.e., best performance). However, the MARS model only contained 4 terms with 2 of the predictors, so it was not an ideal model for comprehensively identifying important risk factors for recovery time, as so few risk factors were included. Therefore, the GAM model will all predictors--the second best model in terms of mean and median RMSE--was selected as the final model in this study.
 
-```{r}
+# Results
+The final GAM model formula uses the `recovery_time` variable as the outcome, and all predictors in the dataset (see Table 2 in the appendix for the model results summary). Dummy variables were created for the patient race variable with "White" set as the reference category, the smoking variable with "Never Smoker" set as the reference category, and the study variable with "Study A" set as the reference category. Additionally, a smoothing function was applied to the numeric predictors (patient age, SBP, LDL cholesterol, BMI, height, and weight)
+
+**Model interpretation:** Significant predictors of COVID-19 recovery time at the 5% level of significance include gender, smoking history, hypertension, vaccination status, infection severity, and study group. The GAM model also identified significant nonlinear relationships between BMI, weight, and height and predicted recovery time. On average: 
+
+- Being male is associated with a 5.3039-day shorter predicted recovery time than being female. 
+- Being a former smoker is associated with a 4.6506-day longer predicted recovery time than never smoking.
+- Being a current smoker is associated with a 8.0189-day longer predicted recovery time than never smoking.
+- having hypertension is associated with a 5.2189-day longer predicted recovery time than no hypertension diagnosis.
+- Being vaccinated is associated with a 8.0292-day shorter predicted recovery time than no vaccination.
+- severe COVID-19 infection is associated with a 9.5517-day longer predicted recovery time than non severe.
+- Being in study B is associated with 4.2897-day longer predicted recovery time than being in study A.
+
+```{r, include = FALSE}
+set.seed(2183)
+
+# calculate and print the GAM model test RMSE
+test_pred <- predict(gam_model_all, newdata = x2)
+test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
+test_rmse
+```
+
+**Model performance:** All of these factors together explain 43.8% of the deviance in COVID-19 recovery time. Additionally, the model's training error of 24.4 (see appendix) indicates that, on average, the model's predictions on the training data deviate from the actual values by 24.4 units. Meanwhile, the test error of 23.8 (see appendix) suggests that the model's performance on unseen data is slightly better than its performance on the training data. This indicates that the model generalizes well to new data. 
+
+# Conclusion
+The final GAM model using all predictor variables found that several factors were statistically significant in predicting time to recovery from COVID-19. On average, having a history of former or current smoking, having hypertension, and experiencing severe COVID-19 infection were all significantly associated with a longer predicted recovery time. Additionally, being in study B was associated with a longer recovery time compared to being in study A. On the other hand, being male and being vaccinated was associated with a shorter recovery time. Finally, BMI, height, and weight are also significantly associated with predicted COVID-19 recovery time. The model did not find significant associations with race or diabetes. These insights can be useful in predicting recovery time and informing clinical decisions in the management of COVID-19 patients.
+
+\newpage
+
+# Appendix
+```{r,  echo = FALSE, results = TRUE}
+featurePlot(x = dat_train_viz[ ,1:14],
+            y = dat_train_viz[ ,15],
+            plot = "scatter",
+            span = .5,
+            labels = c("Predictors (Xs)", "COVID-19 Recovery Time (Y)"),
+            main = "Figure 1. Lattice Plot",
+            type = c("p", "smooth"))
+```
+
+**Table 1. Model Comparison**
+```{r,  echo = FALSE, results = TRUE}
 set.seed(2183)
 
 resamp <- resamples(list(
@@ -320,90 +316,34 @@ bwplot(resamp,
        main = "Figure 2. Model Comparison Plot Using RMSE")
 ```
 
-According to Figure 2, the lasso model had the highest median training RMSE (i.e., worst performance), followed by the GAM model using select predictors, the linear model, the pls model, the elastic net model, the GAM model using all predictors, and finally, The MARS model, which had the lowest median training RMSE (i.e., best performance).
-
-The final model for predicting time to recovery from COVID-19 was selected by comparing the median training RMSE for all models created. The MARS model had the lowest value for mean and median RMSE out of all models, however, it only contained 4 terms with 2 of the predictors. A model with so few predictors would not be an ideal model for predicting recovery time and comprehensively identifying important risk factors for long recovery time, as so few risk factors were included. Therefore, the GAM model will all predictors--the second best model in terms of mean and median RMSE--was selected as the final model for predicting time to recovery from COVID-19 in this study.
-
-
-# Results
-
-**Model formula**
-
-```{r}
+**Table 2. Final GAM Model Summary**
+```{r,  echo = FALSE, results = TRUE}
 # view the model summary for the GAM model using all predictors
 summary(gam_model_all$finalModel)
 ```
 
-The final GAM model formula uses the `recovery_time` variable as the outcome (Y), and the following terms as predictors. Note that "White" (`race` = 0) was set as the reference category for the `race` variable, "Never Smoker" (`smoking` = 0) was set as the reference category for the `smoking` variable, and "Study A" (`study` = A) was set as the reference category for the `study` variable. An s() around the variable name indicates that a smoothing function was applied to the variable. An asterisk (*) next to the term indicates that the term was statistically significant at the 5% level of significance.
+Notes: 
 
-- `gender`*
-- Race: Asian (`race2`)
-- Race: Black (`race3`)
-- Race: Hispanic (`race4`)
-- Smoking: former smoker (`smoking1`)*
-- Smoking: current smoker (`smoking2`)*
-- `hypertension`*
-- `diabetes`
-- `vaccine`*
-- `severity`*
-- Study: B (`studyB`)*
-- Study: C (`studyC`)
-- s(`age`)
-- s(`SBP`)
-- s(`LDL`)
-- s(`bmi`)*
-- s(`height`)*
-- s(`weight`)*
+- "White" (`race` = 0) was set as the reference category for the `race` variable.
+- "Never Smoker" (`smoking` = 0) was set as the reference category for the `smoking` variable.
+- "Study A" (`study` = A) was set as the reference category for the `study` variable.
+- An s() around the variable name indicates that a smoothing function was applied to the variable.
+- An asterisk (*) next to the term indicates that the term was statistically significant at the 5% level of significance.
 
-**Model interpretation**
 
-- On average, being male is associated with a statistically significantly shorter predicted COVID-19 recovery time compared to being female. More specifically, holding all else constant, being male is associated with a 5.3039-day shorter predicted recovery time than being female. 
-- On average, being a former smoker is associated with a statistically significantly longer predicted COVID-19 recovery time compared to being a never smoker. More specifically, holding all else constant, former smoking is associated with a 4.6506-day longer predicted recovery time than never smoking.
-- On average, being a current smoker is associated with a statistically significantly longer predicted COVID-19 recovery time compared to being a never smoker. More specifically, holding all else constant, current smoking is associated with a 8.0189-day longer predicted recovery time than never smoking.
-- On average, having hypertension is associated with a statistically significantly longer predicted COVID-19 recovery time compared to not having hypertension. More specifically, holding all else constant, a hypertension diagnosis is associated with a 5.2189-day longer predicted recovery time than no hypertension diagnosis.
-- On average, being vaccinated is associated with a statistically significantly shorter predicted COVID-19 recovery time compared to not being vaccinated. More specifically, holding all else constant, vaccination is associated with a 8.0292-day shorter predicted recovery time than no vaccination.
-- On average, severe COVID-19 infection is associated with a statistically significantly longer predicted COVID-19 recovery time compared to non severe infection. More specifically, holding all else constant, infection severity is associated with a 9.5517-day longer predicted recovery time than no infection severity.
-- On average, being in study B is associated with a statistically significantly longer predicted COVID-19 recovery time compared to study A. More specifically, holding all else constant, study B is associated with a 4.2897-day longer predicted recovery time than study A.
-
-The GAM model also includes several significant smooth terms to capture the nonlinear relationships between the predictors and COVID-19 recovery time. There is a statistically significant relationship between BMI, weight, and height, and predicted COVID-19 recovery time. 
-
-**Model performance**
-
-```{r}
+**Final GAM model training error calculation (RMSE using the training data):**
+```{r,  echo = FALSE, results = TRUE}
 # print the GAM model training RMSE
 gam_model_all$results$RMSE
 ```
 
-```{r}
+
+**Final GAM model test error calculation (RMSE using the test data):**
+```{r, echo = FALSE, results = TRUE}
 set.seed(2183)
 
 # calculate and print the GAM model test RMSE
 test_pred <- predict(gam_model_all, newdata = x2)
 test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
 test_rmse
-```
-
-All of these factors together explain 43.8% of the deviance in COVID-19 recovery time. Additionally, the model's training error (RMSE using the training dataset) of 24.4 indicates that, on average, the model's predictions on the training data deviate from the actual values by 24.4 units. Meanwhile, the test error (RMSE using the test dataset) of 23.8 suggests that the model's performance on unseen data is slightly better than its performance on the training data. This could indicate that the model is not overfitting to the training data and is generalizing well to new data. 
-
-
-# Conclusion
-
-The final GAM model using all predictor variables found that several factors were statistically significant in predicting time to recovery from COVID-19. On average, having a history of former or current smoking, having hypertension, and experiencing severe COVID-19 infection were all significantly associated with a longer predicted recovery time. Additionally, being in study B was associated with a longer recovery time compared to being in study A. On the other hand, being male and being vaccinated was associated with a shorter recovery time. Finally, BMI, height, and weight are also significantly associated with predicted COVID-19 recovery time. The model did not find significant associations with race or diabetes. These insights can be useful in predicting recovery time and informing clinical decisions in the management of COVID-19 patients.
-
-
-# Appendix
-
-Predictor plots for the final GAM model: 
-
-```{r}
-set.seed(2183)
-
-# Formula based on final GAM model with all predictors (gam_model_all)
-gam_final_model <- gam(recovery_time ~ gender + race + + smoking + 
-                         hypertension + diabetes + vaccine + severity + study + 
-                         s(age) + s(SBP) + s(LDL) + s(bmi) + s(height) + 
-                         s(weight), 
-              data = dat_train) # training dataset
-
-plot(gam_final_model)
 ```
