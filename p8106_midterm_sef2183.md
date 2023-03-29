@@ -403,7 +403,7 @@ argument was used within the `train()` function to specify a PLS model
 fit. Additionally, a tuning parameter for the model were set using the
 tuneGrid argument within the `train()` function. The tuneGrid object
 includes a data frame with a single column ncomp that ranges from 1 to
-15, representing the number of components used in the model. The
+17, representing the number of components used in the model. The
 preProcess argument is set to “center” and “scale”, which means that the
 training data will be centered and scaled prior to model fitting.
 
@@ -412,7 +412,7 @@ set.seed(2183)
 
 pls_model <- train(x, y, # training dataset
                  method = "pls",
-                 tuneGrid = data.frame(ncomp = 1:15),
+                 tuneGrid = data.frame(ncomp = 1:17),
                  trControl = ctrl,
                  preProcess = c("center", "scale"))
 
@@ -579,7 +579,7 @@ Additionally, the `expand.grid()` function is used to generate a grid of
 tuning parameters. The mars_grid object includes two arguments: degree
 is set to 1, 2, and 3, representing the number of possible product hinge
 functions in a single term, and nprune is set to integers between 2 and
-14, representing the upper bound on the number of terms in the model.
+17, representing the upper bound on the number of terms in the model.
 The tuneGrid argument in the `train()` function uses the mars_grid
 object to specify the parameters for model tuning.
 
@@ -588,7 +588,7 @@ set.seed(2183)
 
 # create grid of all possible pairs that can take degree and nprune values
 mars_grid <- expand.grid(degree = 1:3, # number of possible product hinge functions in 1 term
-                         nprune = 2:14) # Upper bound of number of terms in model
+                         nprune = 2:17) # Upper bound of number of terms in model
 
 mars_model <- train(x, y, # training dataset
                   method = "earth",
@@ -774,47 +774,52 @@ significant at the 5% level of significance.
 -   s(`age`)
 -   s(`SBP`)
 -   s(`LDL`)
--   s(`bmi`)
--   s(`height`)
--   s(`weight`)
+-   s(`bmi`)\*
+-   s(`height`)\*
+-   s(`weight`)\*
 
 **Model interpretation**
 
 -   On average, being male is associated with a statistically
     significantly shorter predicted COVID-19 recovery time compared to
     being female. More specifically, holding all else constant, being
-    male is associated with a 5.3009-day shorter predicted recovery time
+    male is associated with a 5.3039-day shorter predicted recovery time
     than being female.
 -   On average, being a former smoker is associated with a statistically
     significantly longer predicted COVID-19 recovery time compared to
     being a never smoker. More specifically, holding all else constant,
-    former smoking is associated with a 4.6688-day longer predicted
+    former smoking is associated with a 4.6506-day longer predicted
     recovery time than never smoking.
 -   On average, being a current smoker is associated with a
     statistically significantly longer predicted COVID-19 recovery time
     compared to being a never smoker. More specifically, holding all
-    else constant, current smoking is associated with a 8.0617-day
+    else constant, current smoking is associated with a 8.0189-day
     longer predicted recovery time than never smoking.
 -   On average, having hypertension is associated with a statistically
     significantly longer predicted COVID-19 recovery time compared to
     not having hypertension. More specifically, holding all else
-    constant, a hypertension diagnosis is associated with a 5.0312-day
+    constant, a hypertension diagnosis is associated with a 5.2189-day
     longer predicted recovery time than no hypertension diagnosis.
 -   On average, being vaccinated is associated with a statistically
     significantly shorter predicted COVID-19 recovery time compared to
     not being vaccinated. More specifically, holding all else constant,
-    vaccination is associated with a 7.9340-day shorter predicted
+    vaccination is associated with a 8.0292-day shorter predicted
     recovery time than no vaccination.
 -   On average, severe COVID-19 infection is associated with a
     statistically significantly longer predicted COVID-19 recovery time
     compared to non severe infection. More specifically, holding all
-    else constant, infection severity is associated with a 9.5456-day
+    else constant, infection severity is associated with a 9.5517-day
     longer predicted recovery time than no infection severity.
 -   On average, being in study B is associated with a statistically
     significantly longer predicted COVID-19 recovery time compared to
     study A. More specifically, holding all else constant, study B is
-    associated with a 4.2338-day longer predicted recovery time than
+    associated with a 4.2897-day longer predicted recovery time than
     study A.
+
+The GAM model also includes several significant smooth terms to capture
+the nonlinear relationships between the predictors and COVID-19 recovery
+time. There is a statistically significant relationship between BMI,
+weight, and height, and predicted COVID-19 recovery time.
 
 **Model performance**
 
@@ -834,27 +839,31 @@ test_rmse
 ## [1] 23.78453
 ```
 
-The model’s training error (RMSE using the training dataset) of 24.4
-indicates that, on average, the model’s predictions on the training data
-deviate from the actual values by 24.4 units. Meanwhile, the test error
-(RMSE using the test dataset) of 23.8 suggests that the model’s
-performance on unseen data is slightly better than its performance on
-the training data. This could indicate that the model is not overfitting
-to the training data and is generalizing well to new data.
+All of these factors together explain 43.8% of the deviance in COVID-19
+recovery time. Additionally, the model’s training error (RMSE using the
+training dataset) of 24.4 indicates that, on average, the model’s
+predictions on the training data deviate from the actual values by 24.4
+units. Meanwhile, the test error (RMSE using the test dataset) of 23.8
+suggests that the model’s performance on unseen data is slightly better
+than its performance on the training data. This could indicate that the
+model is not overfitting to the training data and is generalizing well
+to new data.
 
 # Conclusion
 
 The final GAM model using all predictor variables found that several
 factors were statistically significant in predicting time to recovery
-from COVID-19. On average, being male, having a history of former or
-current smoking, having hypertension, and experiencing severe COVID-19
-infection were all associated with a longer predicted recovery time.
+from COVID-19. On average, having a history of former or current
+smoking, having hypertension, and experiencing severe COVID-19 infection
+were all significantly associated with a longer predicted recovery time.
 Additionally, being in study B was associated with a longer recovery
-time compared to being in study A. On the other hand, being vaccinated
-was associated with a shorter recovery time. The model did not find
-significant associations with race or diabetes. These insights can be
-useful in predicting recovery time and informing clinical decisions in
-the management of COVID-19 patients.
+time compared to being in study A. On the other hand, being male and
+being vaccinated was associated with a shorter recovery time. Finally,
+BMI, height, and weight are also significantly associated with predicted
+COVID-19 recovery time. The model did not find significant associations
+with race or diabetes. These insights can be useful in predicting
+recovery time and informing clinical decisions in the management of
+COVID-19 patients.
 
 # Appendix
 
