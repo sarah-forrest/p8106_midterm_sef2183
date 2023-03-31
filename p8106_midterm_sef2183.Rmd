@@ -2,7 +2,7 @@
 title: "P8106 Data Science II Midterm Project Code: Predicting COVID-19 Recovery Time and Identifying Important Risk Factors"
 author: "Sarah Forrest - sef2183"
 date: "4/5/2023"
-output:
+output: 
   pdf_document:
     toc: yes
     toc_depth: 2
@@ -159,7 +159,7 @@ linear_model <- train(recovery_time ~ age + gender + race + smoking + height +
                method = "lm", 
                trControl = ctrl)
 
-# view the model summary and performance on the test set
+# view the model summary
 summary(linear_model$finalModel)
 
 # view performance on the test set (RMSE)
@@ -181,7 +181,8 @@ lasso_model <- train(x, y, # training dataset
                                           lambda = exp(seq(-1, 5, length = 100))),
                    trControl = ctrl)
 
-# view the model summary
+# view the model cross-validation (tuning parameter selection) plot and summary
+print(plot(lasso_model))
 summary(lasso_model$finalModel)
 
 # view performance on the test set (RMSE)
@@ -204,7 +205,8 @@ enet_model <- train(x, y, # training dataset
                                          lambda = exp(seq(2, -2, length = 50))),
                   trControl = ctrl)
 
-# view the model summary
+# view the model cross-validation (tuning parameter selection) plot and summary
+print(plot(enet_model))
 summary(enet_model$finalModel)
 
 # view performance on the test set (RMSE)
@@ -226,7 +228,8 @@ pls_model <- train(x, y, # training dataset
                  trControl = ctrl,
                  preProcess = c("center", "scale"))
 
-# view the model summary
+# view the model cross-validation (tuning parameter selection) plot and summary
+print(plot(pls_model))
 summary(pls_model$finalModel)
 
 # view performance on the test set (RMSE)
@@ -248,7 +251,8 @@ gam_model_all <- train(x, y,# training dataset
                  trControl = ctrl,
                  control = gam.control(maxit = 200)) # Adjusted due to failure to converge at default setting
 
-# view the model summary
+# view the model cross-validation (tuning parameter selection) plot and summary
+print(plot(gam_model_all))
 summary(gam_model_all$finalModel)
 
 # fit GAM model using selection specification
@@ -288,7 +292,8 @@ mars_model <- train(x, y, # training dataset
                   tuneGrid = mars_grid,
                   trControl = ctrl)
 
-# view the model summary
+# view the model cross-validation (tuning parameter selection) plot and summary
+print(plot(mars_model))
 summary(mars_model$finalModel)
 
 # view performance on the test set (RMSE)
