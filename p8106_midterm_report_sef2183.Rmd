@@ -29,6 +29,7 @@ library(tidyverse)
 library(caret)
 library(mgcv)
 library(earth)
+library(stargazer) # for creating a nice formatted table
 ```
 
 ```{r, include = FALSE}
@@ -253,10 +254,10 @@ test_rmse
 ```
 
 
-The final model was selected by comparing the median training RMSE for all models (see Table 1 and Figure 2 in the appendix). The lasso model had the highest mean and median training RMSE (i.e., worst performance), and the MARS model had the lowest mean and median training RMSE (i.e., best performance). However, the MARS model only contained 4 terms with 2 of the predictors, so it was not an ideal model for comprehensively identifying important risk factors for recovery time, as so few risk factors were included. Therefore, the GAM model will all predictors--the second best model in terms of mean and median RMSE--was selected as the final model in this study.
+The final model was selected by comparing the median training RMSE for all models (Figure 2 in the appendix). The lasso model had the highest mean and median training RMSE (i.e., worst performance), and the MARS model had the lowest mean and median training RMSE (i.e., best performance). However, the MARS model only contained 4 terms with 2 of the predictors, so it was not an ideal model for comprehensively identifying important risk factors for recovery time, as so few risk factors were included. Therefore, the GAM model will all predictors--the second best model in terms of mean and median RMSE--was selected as the final model in this study.
 
 # Results
-The final GAM model formula uses the `recovery_time` variable as the outcome, and all predictors in the dataset (see Table 2 in the appendix for the model results summary). Dummy variables were created for the patient race variable with "White" set as the reference category, the smoking variable with "Never Smoker" set as the reference category, and the study variable with "Study A" set as the reference category. Additionally, a smoothing function was applied to the numeric predictors (patient age, SBP, LDL cholesterol, BMI, height, and weight)
+The final GAM model formula uses the `recovery_time` variable as the outcome, and all predictors in the dataset. Dummy variables were created for the patient race variable with "White" set as the reference category, the smoking variable with "Never Smoker" set as the reference category, and the study variable with "Study A" set as the reference category. Additionally, a smoothing function was applied to the numeric predictors (patient age, SBP, LDL cholesterol, BMI, height, and weight)
 
 **Model interpretation:** Significant predictors of COVID-19 recovery time at the 5% level of significance include gender, smoking history, hypertension, vaccination status, infection severity, and study group. The GAM model also identified significant nonlinear relationships between BMI, weight, and height and predicted recovery time. On average: 
 
@@ -277,7 +278,7 @@ test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
 test_rmse
 ```
 
-**Model performance:** All of these factors together explain 43.8% of the deviance in COVID-19 recovery time. Additionally, the model's training error of 24.4 (see appendix) indicates that, on average, the model's predictions on the training data deviate from the actual values by 24.4 units. Meanwhile, the test error of 23.8 (see appendix) suggests that the model's performance on unseen data is slightly better than its performance on the training data. This indicates that the model generalizes well to new data. 
+**Model performance:** All of these factors together explain 43.8% of the deviance in COVID-19 recovery time. Additionally, the model's training error of 24.4 indicates that, on average, the model's predictions on the training data deviate from the actual values by 24.4 units. Meanwhile, the test error of 23.8 (see appendix) suggests that the model's performance on unseen data is slightly better than its performance on the training data. This indicates that the model generalizes well to new data. 
 
 # Conclusion
 The final GAM model using all predictor variables found that several factors were statistically significant in predicting time to recovery from COVID-19. On average, having a history of former or current smoking, having hypertension, and experiencing severe COVID-19 infection were all significantly associated with a longer predicted recovery time. Additionally, being in study B was associated with a longer recovery time compared to being in study A. On the other hand, being male and being vaccinated was associated with a shorter recovery time. Finally, BMI, height, and weight are also significantly associated with predicted COVID-19 recovery time. The model did not find significant associations with race or diabetes. These insights can be useful in predicting recovery time and informing clinical decisions in the management of COVID-19 patients.
@@ -295,7 +296,6 @@ featurePlot(x = dat_train_viz[ ,1:14],
             type = c("p", "smooth"))
 ```
 
-**Table 1. Model Comparison**
 ```{r,  echo = FALSE, results = TRUE}
 set.seed(2183)
 
@@ -309,41 +309,7 @@ resamp <- resamples(list(
   mars = mars_model
   ))
 
-summary(resamp)
-
 bwplot(resamp, 
        metric = "RMSE",
        main = "Figure 2. Model Comparison Plot Using RMSE")
-```
-
-**Table 2. Final GAM Model Summary**
-```{r,  echo = FALSE, results = TRUE}
-# view the model summary for the GAM model using all predictors
-summary(gam_model_all$finalModel)
-```
-
-Notes: 
-
-- "White" (`race` = 0) was set as the reference category for the `race` variable.
-- "Never Smoker" (`smoking` = 0) was set as the reference category for the `smoking` variable.
-- "Study A" (`study` = A) was set as the reference category for the `study` variable.
-- An s() around the variable name indicates that a smoothing function was applied to the variable.
-- An asterisk (*) next to the term indicates that the term was statistically significant at the 5% level of significance.
-
-
-**Final GAM model training error calculation (RMSE using the training data):**
-```{r,  echo = FALSE, results = TRUE}
-# print the GAM model training RMSE
-gam_model_all$results$RMSE
-```
-
-
-**Final GAM model test error calculation (RMSE using the test data):**
-```{r, echo = FALSE, results = TRUE}
-set.seed(2183)
-
-# calculate and print the GAM model test RMSE
-test_pred <- predict(gam_model_all, newdata = x2)
-test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
-test_rmse
 ```
