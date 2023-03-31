@@ -240,7 +240,7 @@ linear_model <- train(recovery_time ~ age + gender + race + smoking + height +
                method = "lm", 
                trControl = ctrl)
 
-# view the model summary and performance on the test set
+# view the model summary
 summary(linear_model$finalModel)
 ## 
 ## Call:
@@ -309,7 +309,13 @@ lasso_model <- train(x, y, # training dataset
                                           lambda = exp(seq(-1, 5, length = 100))),
                    trControl = ctrl)
 
-# view the model summary
+# view the model cross-validation (tuning parameter selection) plot and summary
+print(plot(lasso_model))
+```
+
+![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+``` r
 summary(lasso_model$finalModel)
 ##             Length Class      Mode     
 ## a0            93   -none-     numeric  
@@ -362,7 +368,13 @@ enet_model <- train(x, y, # training dataset
                                          lambda = exp(seq(2, -2, length = 50))),
                   trControl = ctrl)
 
-# view the model summary
+# view the model cross-validation (tuning parameter selection) plot and summary
+print(plot(enet_model))
+```
+
+![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+``` r
 summary(enet_model$finalModel)
 ##             Length Class      Mode     
 ## a0            93   -none-     numeric  
@@ -416,7 +428,13 @@ pls_model <- train(x, y, # training dataset
                  trControl = ctrl,
                  preProcess = c("center", "scale"))
 
-# view the model summary
+# view the model cross-validation (tuning parameter selection) plot and summary
+print(plot(pls_model))
+```
+
+![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+``` r
 summary(pls_model$finalModel)
 ## Data:    X dimension: 1402 18 
 ##  Y dimension: 1402 1
@@ -462,7 +480,13 @@ gam_model_all <- train(x, y,# training dataset
                  trControl = ctrl,
                  control = gam.control(maxit = 200)) # Adjusted due to failure to converge at default setting
 
-# view the model summary
+# view the model cross-validation (tuning parameter selection) plot and summary
+print(plot(gam_model_all))
+```
+
+![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+``` r
 summary(gam_model_all$finalModel)
 ## 
 ## Family: gaussian 
@@ -595,7 +619,13 @@ mars_model <- train(x, y, # training dataset
                   tuneGrid = mars_grid,
                   trControl = ctrl)
 
-# view the model summary
+# view the model cross-validation (tuning parameter selection) plot and summary
+print(plot(mars_model))
+```
+
+![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+``` r
 summary(mars_model$finalModel)
 ## Call: earth(x=matrix[1402,18], y=c(44,49,38,46,5...), keepxy=TRUE, degree=2,
 ##             nprune=4)
