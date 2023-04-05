@@ -40,10 +40,10 @@ contained the remaining 30%. All data partitions were conducted using a
 seed set to my UNI number (2183) for reproducibility.
 
 ``` r
-set.seed(2183) # for reproducibility - my UNI
-
 # read in dataset
 load("data/recovery.Rdata")
+
+set.seed(2183) # for reproducibility - my UNI
 
 # create a random sample of 2000 participants
 dat <- dat[sample(1:10000, 2000),] 
@@ -51,6 +51,8 @@ dat <- dat[sample(1:10000, 2000),]
 # remove the id variable from the dataset
 dat <- dat %>%
   select(-id)
+
+set.seed(2183)
 
 # specify rows of training data (70% of the dataset)
 trRows <- createDataPartition(dat$recovery_time, p = 0.7, list = FALSE)
@@ -232,9 +234,12 @@ set.seed(2183)
 # 10-fold cross-validation repeated 5 times using the best rule
 ctrl <- trainControl(method = "repeatedcv", number = 10, repeats = 5)
 
+set.seed(2183)
+
 # Fit a linear regression model using cross-validation on the training dataset
-linear_model <- train(recovery_time ~ age + gender + race + smoking + height + 
-                        weight + bmi + hypertension + diabetes + SBP + LDL + 
+linear_model <- train(recovery_time ~ age + gender + race + smoking +
+                        height + weight + bmi + hypertension +
+                        diabetes + SBP + LDL + 
                         vaccine + severity + study, 
                data = dat_train, # training dataset
                method = "lm", 
@@ -247,42 +252,42 @@ summary(linear_model$finalModel)
 ## lm(formula = .outcome ~ ., data = dat)
 ## 
 ## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -100.835  -13.828   -1.023    9.781  286.247 
+##     Min      1Q  Median      3Q     Max 
+## -64.119 -14.513  -1.103   9.605 252.860 
 ## 
 ## Coefficients:
 ##                Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)  -3.364e+03  1.976e+02 -17.025  < 2e-16 ***
-## age          -2.797e-01  1.804e-01  -1.550 0.121310    
-## gender       -4.758e+00  1.395e+00  -3.411 0.000666 ***
-## race2         2.876e-01  2.966e+00   0.097 0.922767    
-## race3        -4.189e-01  1.778e+00  -0.236 0.813759    
-## race4        -1.523e+00  2.509e+00  -0.607 0.543896    
-## smoking1      4.969e+00  1.563e+00   3.179 0.001509 ** 
-## smoking2      7.510e+00  2.336e+00   3.215 0.001336 ** 
-## height        1.972e+01  1.164e+00  16.939  < 2e-16 ***
-## weight       -2.133e+01  1.237e+00 -17.247  < 2e-16 ***
-## bmi           6.370e+01  3.513e+00  18.136  < 2e-16 ***
-## hypertension  3.905e+00  2.306e+00   1.693 0.090621 .  
-## diabetes     -2.875e+00  1.966e+00  -1.463 0.143828    
-## SBP           9.011e-02  1.510e-01   0.597 0.550688    
-## LDL          -1.173e-02  3.875e-02  -0.303 0.762120    
-## vaccine      -8.184e+00  1.419e+00  -5.767 9.95e-09 ***
-## severity      9.221e+00  2.378e+00   3.877 0.000111 ***
-## studyB        5.023e+00  1.809e+00   2.777 0.005558 ** 
-## studyC       -1.602e+00  2.214e+00  -0.724 0.469462    
+## (Intercept)  -3.109e+03  2.031e+02 -15.306  < 2e-16 ***
+## age          -1.049e-01  1.839e-01  -0.570 0.568643    
+## gender       -7.061e+00  1.392e+00  -5.072 4.47e-07 ***
+## race2         1.708e+00  2.928e+00   0.583 0.559903    
+## race3        -1.384e+00  1.770e+00  -0.782 0.434469    
+## race4        -1.644e+00  2.409e+00  -0.682 0.495145    
+## smoking1      4.899e+00  1.560e+00   3.140 0.001722 ** 
+## smoking2      8.278e+00  2.372e+00   3.491 0.000497 ***
+## height        1.804e+01  1.195e+00  15.103  < 2e-16 ***
+## weight       -1.927e+01  1.266e+00 -15.227  < 2e-16 ***
+## bmi           5.844e+01  3.617e+00  16.159  < 2e-16 ***
+## hypertension  3.662e+00  2.330e+00   1.572 0.116236    
+## diabetes     -3.433e+00  1.977e+00  -1.737 0.082664 .  
+## SBP           1.001e-01  1.524e-01   0.657 0.511393    
+## LDL           2.597e-03  3.806e-02   0.068 0.945611    
+## vaccine      -8.170e+00  1.414e+00  -5.778 9.33e-09 ***
+## severity      6.256e+00  2.396e+00   2.611 0.009120 ** 
+## studyB        4.355e+00  1.777e+00   2.450 0.014398 *  
+## studyC       -1.339e+00  2.197e+00  -0.609 0.542396    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 25.98 on 1383 degrees of freedom
-## Multiple R-squared:  0.3079, Adjusted R-squared:  0.2989 
-## F-statistic: 34.18 on 18 and 1383 DF,  p-value: < 2.2e-16
+## Residual standard error: 25.88 on 1383 degrees of freedom
+## Multiple R-squared:  0.2909, Adjusted R-squared:  0.2817 
+## F-statistic: 31.52 on 18 and 1383 DF,  p-value: < 2.2e-16
 
 # view performance on the test set (RMSE)
 test_pred <- predict(linear_model, newdata = dat_test) # test dataset
 test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
 test_rmse
-## [1] 27.30982
+## [1] 27.34561
 ```
 
 **2. Lasso model**
@@ -318,12 +323,12 @@ print(plot(lasso_model))
 ``` r
 summary(lasso_model$finalModel)
 ##             Length Class      Mode     
-## a0            93   -none-     numeric  
-## beta        1674   dgCMatrix  S4       
-## df            93   -none-     numeric  
+## a0            94   -none-     numeric  
+## beta        1692   dgCMatrix  S4       
+## df            94   -none-     numeric  
 ## dim            2   -none-     numeric  
-## lambda        93   -none-     numeric  
-## dev.ratio     93   -none-     numeric  
+## lambda        94   -none-     numeric  
+## dev.ratio     94   -none-     numeric  
 ## nulldev        1   -none-     numeric  
 ## npasses        1   -none-     numeric  
 ## jerr           1   -none-     numeric  
@@ -341,7 +346,7 @@ summary(lasso_model$finalModel)
 test_pred <- predict(lasso_model, newdata = x2) # test dataset
 test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
 test_rmse
-## [1] 27.73567
+## [1] 29.24864
 ```
 
 **3. Elastic net model**
@@ -377,12 +382,12 @@ print(plot(enet_model))
 ``` r
 summary(enet_model$finalModel)
 ##             Length Class      Mode     
-## a0            93   -none-     numeric  
-## beta        1674   dgCMatrix  S4       
-## df            93   -none-     numeric  
+## a0            94   -none-     numeric  
+## beta        1692   dgCMatrix  S4       
+## df            94   -none-     numeric  
 ## dim            2   -none-     numeric  
-## lambda        93   -none-     numeric  
-## dev.ratio     93   -none-     numeric  
+## lambda        94   -none-     numeric  
+## dev.ratio     94   -none-     numeric  
 ## nulldev        1   -none-     numeric  
 ## npasses        1   -none-     numeric  
 ## jerr           1   -none-     numeric  
@@ -400,7 +405,7 @@ summary(enet_model$finalModel)
 test_pred <- predict(enet_model, newdata = x2) # test dataset
 test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
 test_rmse
-## [1] 26.94222
+## [1] 27.77103
 ```
 
 **4. Partial least squares (PLS) model**
@@ -442,17 +447,17 @@ summary(pls_model$finalModel)
 ## Number of components considered: 11
 ## TRAINING: % variance explained
 ##           1 comps  2 comps  3 comps  4 comps  5 comps  6 comps  7 comps
-## X            9.37    15.87    24.74    32.06    38.04    43.55    47.79
-## .outcome    14.34    15.29    15.44    15.63    16.10    17.31    21.19
+## X           9.853    17.56    27.14    32.78    38.53    43.47    47.92
+## .outcome   15.537    16.50    16.65    16.80    17.26    19.02    23.30
 ##           8 comps  9 comps  10 comps  11 comps
-## X           50.94    54.89     57.94     62.26
-## .outcome    26.60    28.97     30.56     30.78
+## X           51.14    56.12     60.94     63.06
+## .outcome    28.21    28.94     29.02     29.08
 
 # view performance on the test set (RMSE)
 test_pred <- predict(pls_model, newdata = x2) # test dataset
 test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
 test_rmse
-## [1] 27.32134
+## [1] 27.34478
 ```
 
 **5. Generalized additive model (GAM)**
@@ -461,33 +466,25 @@ A GAM model is a model that extends the linear model by allowing for
 nonlinear relationships between the predictor and response variables,
 using flexible functions called splines. It has the same assumptions as
 the linear model. A method = “gam” argument was used within the
-`train()` function to specify a GAM fit. Additionally, two separate GAM
-models were fit: one GAM model using all predictors, and one GAM model
-with variable selection performed during model training. For the
-variable selection GAM model, a tuneGrid object was specified within the
-`train()` function. The tuneGrid object includes a data frame with two
-arguments: method is set to “GCV.Cp”, which represents the generalized
-cross-validation with the Cp criterion for smoothing parameter
-selection, and select is set to TRUE, indicating that variable selection
-will be performed during model training.
+`train()` function to specify a GAM fit.
 
 ``` r
 set.seed(2183)
 
 # fit GAM model using all predictors
-gam_model_all <- train(x, y,# training dataset
+gam_model <- train(x, y,# training dataset
                  method = "gam",
                  trControl = ctrl,
                  control = gam.control(maxit = 200)) # Adjusted due to failure to converge at default setting
 
 # view the model cross-validation (tuning parameter selection) plot and summary
-print(plot(gam_model_all))
+print(plot(gam_model))
 ```
 
 ![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
-summary(gam_model_all$finalModel)
+summary(gam_model$finalModel)
 ## 
 ## Family: gaussian 
 ## Link function: identity 
@@ -499,97 +496,41 @@ summary(gam_model_all$finalModel)
 ## 
 ## Parametric coefficients:
 ##              Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)   42.6484     2.1195  20.122  < 2e-16 ***
-## gender        -5.3039     1.2736  -4.165 3.31e-05 ***
-## race2         -0.9167     2.6968  -0.340 0.733965    
-## race3          0.6748     1.6198   0.417 0.677042    
-## race4         -1.7393     2.2845  -0.761 0.446589    
-## smoking1       4.6506     1.4235   3.267 0.001114 ** 
-## smoking2       8.0189     2.1284   3.768 0.000172 ***
-## hypertension   5.2189     2.0964   2.490 0.012910 *  
-## diabetes      -2.1693     1.7875  -1.214 0.225124    
-## vaccine       -8.0292     1.2915  -6.217 6.72e-10 ***
-## severity       9.5517     2.1691   4.404 1.15e-05 ***
-## studyB         4.2897     1.6510   2.598 0.009470 ** 
-## studyC        -1.5110     2.0152  -0.750 0.453522    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Approximate significance of smooth terms:
-##             edf Ref.df      F  p-value    
-## s(age)    1.000  1.000  1.640  0.20058    
-## s(SBP)    1.000  1.000  0.034  0.85404    
-## s(LDL)    1.000  1.000  1.009  0.31524    
-## s(bmi)    8.795  8.985 66.151  < 2e-16 ***
-## s(height) 7.741  8.605  4.054 5.81e-05 ***
-## s(weight) 1.000  1.000  7.639  0.00579 ** 
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## R-sq.(adj) =  0.425   Deviance explained = 43.8%
-## GCV = 567.18  Scale est. = 553.61    n = 1402
-
-# fit GAM model using selection specification
-gam_model_select <- train(x, y, # training dataset
-                 method = "gam",
-                 tuneGrid = data.frame(method = "GCV.Cp", select = c(TRUE)),
-                 trControl = ctrl, # 10-fold CV
-                 control = gam.control(maxit = 200))  # Adjusted due to failure to converge at default setting
-
-# view the model summary
-summary(gam_model_select$finalModel)
-## 
-## Family: gaussian 
-## Link function: identity 
-## 
-## Formula:
-## .outcome ~ gender + race2 + race3 + race4 + smoking1 + smoking2 + 
-##     hypertension + diabetes + vaccine + severity + studyB + studyC + 
-##     s(age) + s(SBP) + s(LDL) + s(bmi) + s(height) + s(weight)
-## 
-## Parametric coefficients:
-##              Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)   42.7218     1.9674  21.714  < 2e-16 ***
-## gender        -5.3009     1.2722  -4.167 3.28e-05 ***
-## race2         -0.8627     2.6916  -0.321 0.748624    
-## race3          0.6957     1.6182   0.430 0.667335    
-## race4         -1.7361     2.2804  -0.761 0.446606    
-## smoking1       4.6688     1.4214   3.285 0.001047 ** 
-## smoking2       8.0617     2.1250   3.794 0.000155 ***
-## hypertension   5.0312     1.3159   3.823 0.000138 ***
-## diabetes      -2.2040     1.7854  -1.234 0.217247    
-## vaccine       -7.9340     1.2877  -6.161 9.46e-10 ***
-## severity       9.5456     2.1636   4.412 1.10e-05 ***
-## studyB         4.2338     1.6469   2.571 0.010252 *  
-## studyC        -1.6042     2.0078  -0.799 0.424426    
+## (Intercept)  43.96343    1.93341  22.739  < 2e-16 ***
+## gender       -7.51837    1.25233  -6.003 2.47e-09 ***
+## race2         1.58941    2.62425   0.606 0.544841    
+## race3        -0.69381    1.59081  -0.436 0.662810    
+## race4        -1.95092    2.16143  -0.903 0.366895    
+## smoking1      4.64945    1.39753   3.327 0.000902 ***
+## smoking2      8.73771    2.12834   4.105 4.28e-05 ***
+## hypertension  4.43411    1.34730   3.291 0.001023 ** 
+## diabetes     -0.65604    1.78312  -0.368 0.712993    
+## vaccine      -7.80343    1.26842  -6.152 1.00e-09 ***
+## severity      6.61473    2.15179   3.074 0.002154 ** 
+## studyB        4.44936    1.60182   2.778 0.005550 ** 
+## studyC       -0.08194    1.97615  -0.041 0.966932    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Approximate significance of smooth terms:
 ##                 edf Ref.df      F  p-value    
-## s(age)    5.026e-01      9  0.121 0.139808    
-## s(SBP)    2.165e-07      9  0.000 0.969829    
-## s(LDL)    1.859e-01      9  0.027 0.247466    
-## s(bmi)    7.715e+00      9 65.842  < 2e-16 ***
-## s(height) 7.726e+00      9  4.179 3.17e-06 ***
-## s(weight) 1.000e+00      9  1.436 0.000232 ***
+## s(age)    4.509e+00      9  1.554  0.00624 ** 
+## s(SBP)    1.504e-06      9  0.000  0.41642    
+## s(LDL)    4.897e-07      9  0.000  0.69971    
+## s(bmi)    6.064e+00      9 50.348  < 2e-16 ***
+## s(height) 8.241e+00      9  4.700 4.58e-07 ***
+## s(weight) 4.979e+00      9  1.436  0.00783 ** 
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## R-sq.(adj) =  0.426   Deviance explained = 43.8%
-## GCV = 565.13  Scale est. = 552.99    n = 1402
+## R-sq.(adj) =  0.427   Deviance explained = 44.2%
+## GCV = 548.83  Scale est. = 534.42    n = 1402
 
-# view performance on the test set (RMSE) for the model with all predictors
-test_pred <- predict(gam_model_all, newdata = x2) # test dataset
+# view performance on the test set (RMSE)
+test_pred <- predict(gam_model, newdata = x2) # test dataset
 test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
 test_rmse
-## [1] 23.78453
-
-# view performance on the test set (RMSE) for the model with select predictors
-test_pred <- predict(gam_model_select, newdata = x2) # test dataset
-test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
-test_rmse
-## [1] 23.7401
+## [1] 25.45068
 ```
 
 **6. Multivariate adaptive regression spline (MARS) model**
@@ -608,13 +549,42 @@ The tuneGrid argument in the `train()` function uses the mars_grid
 object to specify the parameters for model tuning.
 
 ``` r
-set.seed(2183)
+# create dummy variables for categorical variables
+df_dummies <- data.frame(model.matrix(~ . - 1, data = dat[, c("gender", "race", "smoking", "hypertension", "diabetes", "vaccine", "severity", "study")]), # exclude ID and continuous variables
+                         age = dat$age,
+                         height = dat$height,
+                         weight = dat$weight,
+                         bmi = dat$bmi,
+                         SBP = dat$SBP,
+                         LDL = dat$LDL,
+                         recovery_time = dat$recovery_time) # add continuous variables back to the data frame
 
+# rename df_dummies dataset as dat
+dat_mars <- df_dummies
+
+# training data
+dat_train_mars <- dat_mars[trRows, ]
+## matrix of predictors
+x_mars <- model.matrix(recovery_time~.,dat_mars)[trRows,-1]
+## vector of response
+y_mars <- dat_mars$recovery_time[trRows]
+
+# test data
+dat_test_mars <- dat_mars[-trRows, ]
+## matrix of predictors
+x2_mars <- model.matrix(recovery_time~.,dat_mars)[-trRows,-1]
+## vector of response
+y2_mars <- dat_mars$recovery_time[-trRows]
+```
+
+``` r
 # create grid of all possible pairs that can take degree and nprune values
 mars_grid <- expand.grid(degree = 1:3, # number of possible product hinge functions in 1 term
-                         nprune = 2:17) # Upper bound of number of terms in model
+                         nprune = 2:17) # upper bound of number of terms in model
 
-mars_model <- train(x, y, # training dataset
+set.seed(2183)
+
+mars_model <- train(x_mars, y_mars, # training dataset
                   method = "earth",
                   tuneGrid = mars_grid,
                   trControl = ctrl)
@@ -623,30 +593,32 @@ mars_model <- train(x, y, # training dataset
 print(plot(mars_model))
 ```
 
-![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ``` r
 summary(mars_model$finalModel)
-## Call: earth(x=matrix[1402,18], y=c(44,49,38,46,5...), keepxy=TRUE, degree=2,
-##             nprune=4)
+## Call: earth(x=matrix[1402,19], y=c(49,38,46,53,3...), keepxy=TRUE, degree=3,
+##             nprune=6)
 ## 
-##                      coefficients
-## (Intercept)             -43.33869
-## h(bmi-23.5)              10.92775
-## h(30.9-bmi)              10.82866
-## h(bmi-30.9) * studyB     22.96750
+##                                 coefficients
+## (Intercept)                       -28.923070
+## gender                             -7.655526
+## h(bmi-23.4)                         9.511406
+## h(30.7-bmi)                         9.590069
+## studyB * h(bmi-30.7)               17.390398
+## smoking1 * studyB * h(bmi-30.7)    16.474027
 ## 
-## Selected 4 of 22 terms, and 2 of 18 predictors (nprune=4)
-## Termination condition: Reached nk 37
-## Importance: bmi, studyB, age-unused, gender-unused, race2-unused, ...
-## Number of terms at each degree of interaction: 1 2 1
-## GCV 542.6388    RSS 751582.7    GRSq 0.4367837    RSq 0.4427977
+## Selected 6 of 27 terms, and 4 of 19 predictors (nprune=6)
+## Termination condition: Reached nk 39
+## Importance: studyB, bmi, smoking1, gender, race1-unused, race2-unused, ...
+## Number of terms at each degree of interaction: 1 3 1 1
+## GCV 491.2801    RSS 675574    GRSq 0.47361    RSq 0.4829613
 
 # view performance on the test set (RMSE)
-test_pred <- predict(mars_model, newdata = x2) # test dataset
-test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
+test_pred <- predict(mars_model, newdata = x2_mars) # test dataset
+test_rmse <- sqrt(mean((test_pred - dat_test_mars$recovery_time)^2))
 test_rmse
-## [1] 23.06663
+## [1] 23.63058
 ```
 
 **Model comparison**
@@ -663,8 +635,7 @@ resamp <- resamples(list(
   lasso = lasso_model,
   enet = enet_model,
   pls = pls_model,
-  gam_all = gam_model_all,
-  gam_select = gam_model_select,
+  gam = gam_model,
   mars = mars_model
   ))
 
@@ -673,62 +644,58 @@ summary(resamp)
 ## Call:
 ## summary.resamples(object = resamp)
 ## 
-## Models: lm, lasso, enet, pls, gam_all, gam_select, mars 
+## Models: lm, lasso, enet, pls, gam, mars 
 ## Number of resamples: 50 
 ## 
 ## MAE 
-##                Min.  1st Qu.   Median     Mean  3rd Qu.     Max. NA's
-## lm         12.73505 15.39825 16.12348 16.47142 17.75496 20.12710    0
-## lasso      13.46116 15.56922 16.52594 16.76562 17.59255 21.58307    0
-## enet       12.80380 14.94888 16.15967 16.06836 17.07309 20.37231    0
-## pls        12.74936 15.38941 16.13187 16.47089 17.75006 20.13645    0
-## gam_all    12.23868 14.72597 15.56555 15.59514 16.25176 18.68100    0
-## gam_select 12.80144 14.36029 15.49947 15.61425 16.51267 19.37225    0
-## mars       13.36260 14.03692 15.32847 15.39812 16.31531 19.08560    0
+##           Min.  1st Qu.   Median     Mean  3rd Qu.     Max. NA's
+## lm    13.06852 15.82773 16.65854 16.68009 17.52988 19.53885    0
+## lasso 14.25843 15.92356 16.50435 16.89763 17.65061 20.10554    0
+## enet  13.56431 15.46643 16.26234 16.31209 17.07245 19.30336    0
+## pls   13.06709 15.77555 16.68261 16.67911 17.53197 19.49819    0
+## gam   12.93158 15.19322 16.00336 15.87566 16.72480 19.49579    0
+## mars  12.66352 14.32980 15.19281 15.40187 16.04710 18.87256    0
 ## 
 ## RMSE 
-##                Min.  1st Qu.   Median     Mean  3rd Qu.     Max. NA's
-## lm         16.82876 21.40034 23.77686 25.68307 29.70809 44.81248    0
-## lasso      17.16745 22.15436 25.00758 27.85853 33.52794 52.01572    0
-## enet       16.30816 20.86376 23.51353 26.01873 30.95194 48.57930    0
-## pls        16.83601 21.40035 23.77552 25.68226 29.70413 44.82724    0
-## gam_all    15.88988 21.15587 22.91025 24.37900 26.73050 39.29095    0
-## gam_select 17.15290 20.86770 24.26783 24.58489 27.94064 37.21158    0
-## mars       17.54908 20.46545 22.14328 23.64786 25.93674 37.85683    0
+##           Min.  1st Qu.   Median     Mean  3rd Qu.     Max. NA's
+## lm    17.46778 21.95953 24.41580 25.69236 28.94167 37.61437    0
+## lasso 19.81271 22.77017 24.26439 27.48116 33.14234 42.17530    0
+## enet  18.37685 21.91826 23.93991 26.11100 30.98068 39.92701    0
+## pls   17.46405 21.95236 24.41786 25.69095 28.97255 37.62563    0
+## gam   18.09395 20.67294 23.27995 23.96824 26.78507 36.01007    0
+## mars  16.51977 20.58231 22.53261 23.49522 26.34327 34.91041    0
 ## 
 ## Rsquared 
-##                  Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA's
-## lm         0.05285722 0.2198029 0.2767746 0.2885150 0.3387478 0.5731047    0
-## lasso      0.01531994 0.1044821 0.1556263 0.1561066 0.1878872 0.3803743    0
-## enet       0.04358373 0.2111552 0.2718273 0.2694211 0.3090849 0.5422976    0
-## pls        0.05348801 0.2197665 0.2766038 0.2885046 0.3358747 0.5727813    0
-## gam_all    0.10729883 0.2735852 0.3530194 0.3695334 0.4524725 0.6629995    0
-## gam_select 0.09078299 0.2964500 0.3537030 0.3728204 0.4720036 0.6360189    0
-## mars       0.04978937 0.2303193 0.3635106 0.3824594 0.5128183 0.7686433    0
+##             Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA's
+## lm    0.04722889 0.1947930 0.2788224 0.2727476 0.3461258 0.4918482    0
+## lasso 0.01741077 0.1286390 0.1719990 0.1642228 0.2141429 0.2929154    0
+## enet  0.04074479 0.1996787 0.2583386 0.2451645 0.3170416 0.4390000    0
+## pls   0.04791543 0.1950316 0.2791061 0.2727537 0.3451321 0.4920658    0
+## gam   0.13579308 0.2730556 0.3540842 0.3704064 0.4406017 0.6293796    0
+## mars  0.03523834 0.2388844 0.3894285 0.3901751 0.5168117 0.7480162    0
 
 bwplot(resamp, 
        metric = "RMSE",
        main = "Figure 2. Model Comparison Plot Using RMSE")
 ```
 
-![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
-According to Figure 2, the lasso model had the highest median training
-RMSE (i.e., worst performance), followed by the GAM model using select
-predictors, the linear model, the pls model, the elastic net model, the
-GAM model using all predictors, and finally, The MARS model, which had
-the lowest median training RMSE (i.e., best performance).
+According to Figure 2, the PLS model had the highest median training
+RMSE (i.e., worst performance), followed by the linear model, the lasso
+model, the elastic net model, the GAM model, and finally, The MARS
+model, which had the lowest median training RMSE (i.e., best
+performance).
 
 The final model for predicting time to recovery from COVID-19 was
 selected by comparing the median training RMSE for all models created.
 The MARS model had the lowest value for mean and median RMSE out of all
-models, however, it only contained 4 terms with 2 of the predictors. A
-model with so few predictors would not be an ideal model for predicting
-recovery time and comprehensively identifying important risk factors for
-long recovery time, as so few risk factors were included. Therefore, the
-GAM model will all predictors–the second best model in terms of mean and
-median RMSE–was selected as the final model for predicting time to
-recovery from COVID-19 in this study.
+models, however, it only contained 4 of the predictors. A model with so
+few predictors would not be an ideal model for predicting recovery time
+and comprehensively identifying important risk factors for long recovery
+time, as so few risk factors were included. Therefore, the GAM model–the
+second best model in terms of mean and median RMSE–was selected as the
+final model for predicting time to recovery from COVID-19 in this study.
 
 # Results
 
@@ -736,7 +703,7 @@ recovery from COVID-19 in this study.
 
 ``` r
 # view the model summary for the GAM model using all predictors
-summary(gam_model_all$finalModel)
+summary(gam_model$finalModel)
 ## 
 ## Family: gaussian 
 ## Link function: identity 
@@ -748,35 +715,35 @@ summary(gam_model_all$finalModel)
 ## 
 ## Parametric coefficients:
 ##              Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)   42.6484     2.1195  20.122  < 2e-16 ***
-## gender        -5.3039     1.2736  -4.165 3.31e-05 ***
-## race2         -0.9167     2.6968  -0.340 0.733965    
-## race3          0.6748     1.6198   0.417 0.677042    
-## race4         -1.7393     2.2845  -0.761 0.446589    
-## smoking1       4.6506     1.4235   3.267 0.001114 ** 
-## smoking2       8.0189     2.1284   3.768 0.000172 ***
-## hypertension   5.2189     2.0964   2.490 0.012910 *  
-## diabetes      -2.1693     1.7875  -1.214 0.225124    
-## vaccine       -8.0292     1.2915  -6.217 6.72e-10 ***
-## severity       9.5517     2.1691   4.404 1.15e-05 ***
-## studyB         4.2897     1.6510   2.598 0.009470 ** 
-## studyC        -1.5110     2.0152  -0.750 0.453522    
+## (Intercept)  43.96343    1.93341  22.739  < 2e-16 ***
+## gender       -7.51837    1.25233  -6.003 2.47e-09 ***
+## race2         1.58941    2.62425   0.606 0.544841    
+## race3        -0.69381    1.59081  -0.436 0.662810    
+## race4        -1.95092    2.16143  -0.903 0.366895    
+## smoking1      4.64945    1.39753   3.327 0.000902 ***
+## smoking2      8.73771    2.12834   4.105 4.28e-05 ***
+## hypertension  4.43411    1.34730   3.291 0.001023 ** 
+## diabetes     -0.65604    1.78312  -0.368 0.712993    
+## vaccine      -7.80343    1.26842  -6.152 1.00e-09 ***
+## severity      6.61473    2.15179   3.074 0.002154 ** 
+## studyB        4.44936    1.60182   2.778 0.005550 ** 
+## studyC       -0.08194    1.97615  -0.041 0.966932    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Approximate significance of smooth terms:
-##             edf Ref.df      F  p-value    
-## s(age)    1.000  1.000  1.640  0.20058    
-## s(SBP)    1.000  1.000  0.034  0.85404    
-## s(LDL)    1.000  1.000  1.009  0.31524    
-## s(bmi)    8.795  8.985 66.151  < 2e-16 ***
-## s(height) 7.741  8.605  4.054 5.81e-05 ***
-## s(weight) 1.000  1.000  7.639  0.00579 ** 
+##                 edf Ref.df      F  p-value    
+## s(age)    4.509e+00      9  1.554  0.00624 ** 
+## s(SBP)    1.504e-06      9  0.000  0.41642    
+## s(LDL)    4.897e-07      9  0.000  0.69971    
+## s(bmi)    6.064e+00      9 50.348  < 2e-16 ***
+## s(height) 8.241e+00      9  4.700 4.58e-07 ***
+## s(weight) 4.979e+00      9  1.436  0.00783 ** 
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## R-sq.(adj) =  0.425   Deviance explained = 43.8%
-## GCV = 567.18  Scale est. = 553.61    n = 1402
+## R-sq.(adj) =  0.427   Deviance explained = 44.2%
+## GCV = 548.83  Scale est. = 534.42    n = 1402
 ```
 
 The final GAM model formula uses the `recovery_time` variable as the
@@ -801,7 +768,7 @@ significant at the 5% level of significance.
 -   `severity`\*
 -   Study: B (`studyB`)\*
 -   Study: C (`studyC`)
--   s(`age`)
+-   s(`age`)\*
 -   s(`SBP`)
 -   s(`LDL`)
 -   s(`bmi`)\*
@@ -813,87 +780,84 @@ significant at the 5% level of significance.
 -   On average, being male is associated with a statistically
     significantly shorter predicted COVID-19 recovery time compared to
     being female. More specifically, holding all else constant, being
-    male is associated with a 5.3039-day shorter predicted recovery time
-    than being female.
+    male is associated with a 7.51837-day shorter predicted recovery
+    time than being female.
 -   On average, being a former smoker is associated with a statistically
     significantly longer predicted COVID-19 recovery time compared to
     being a never smoker. More specifically, holding all else constant,
-    former smoking is associated with a 4.6506-day longer predicted
+    former smoking is associated with a 4.64945-day longer predicted
     recovery time than never smoking.
 -   On average, being a current smoker is associated with a
     statistically significantly longer predicted COVID-19 recovery time
     compared to being a never smoker. More specifically, holding all
-    else constant, current smoking is associated with a 8.0189-day
+    else constant, current smoking is associated with a 8.73771-day
     longer predicted recovery time than never smoking.
 -   On average, having hypertension is associated with a statistically
     significantly longer predicted COVID-19 recovery time compared to
     not having hypertension. More specifically, holding all else
-    constant, a hypertension diagnosis is associated with a 5.2189-day
+    constant, a hypertension diagnosis is associated with a 4.43411-day
     longer predicted recovery time than no hypertension diagnosis.
 -   On average, being vaccinated is associated with a statistically
     significantly shorter predicted COVID-19 recovery time compared to
     not being vaccinated. More specifically, holding all else constant,
-    vaccination is associated with a 8.0292-day shorter predicted
+    vaccination is associated with a 7.80343-day shorter predicted
     recovery time than no vaccination.
 -   On average, severe COVID-19 infection is associated with a
     statistically significantly longer predicted COVID-19 recovery time
     compared to non severe infection. More specifically, holding all
-    else constant, infection severity is associated with a 9.5517-day
+    else constant, infection severity is associated with a 6.61473-day
     longer predicted recovery time than no infection severity.
 -   On average, being in study B is associated with a statistically
     significantly longer predicted COVID-19 recovery time compared to
     study A. More specifically, holding all else constant, study B is
-    associated with a 4.2897-day longer predicted recovery time than
+    associated with a 4.44936-day longer predicted recovery time than
     study A.
 
 The GAM model also includes several significant smooth terms to capture
 the nonlinear relationships between the predictors and COVID-19 recovery
-time. There is a statistically significant relationship between BMI,
-weight, and height, and predicted COVID-19 recovery time.
+time. There is a statistically significant relationship between age,
+BMI, weight, and height, and predicted COVID-19 recovery time.
 
 **Model performance**
 
 ``` r
 # print the GAM model training RMSE
-gam_model_all$results$RMSE
-## [1] 24.37900 24.41081
+gam_model$results$RMSE
+## [1] 23.99106 23.96824
 ```
 
 ``` r
 set.seed(2183)
 
 # calculate and print the GAM model test RMSE
-test_pred <- predict(gam_model_all, newdata = x2)
+test_pred <- predict(gam_model, newdata = x2)
 test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
 test_rmse
-## [1] 23.78453
+## [1] 25.45068
 ```
 
-All of these factors together explain 43.8% of the deviance in COVID-19
+All of these factors together explain 44.2% of the deviance in COVID-19
 recovery time. Additionally, the model’s training error (RMSE using the
-training dataset) of 24.4 indicates that, on average, the model’s
-predictions on the training data deviate from the actual values by 24.4
-units. Meanwhile, the test error (RMSE using the test dataset) of 23.8
-suggests that the model’s performance on unseen data is slightly better
-than its performance on the training data. This could indicate that the
-model is not overfitting to the training data and is generalizing well
-to new data.
+training dataset) of about 24.0 (rounded) indicates that, on average,
+the model’s predictions on the training data deviate from the actual
+values by 24 units. Meanwhile, the test error (RMSE using the test
+dataset) of 25.5 (rounded) suggests that the model’s performance on
+unseen data is slightly worse than its performance on the training data.
 
 # Conclusion
 
-The final GAM model using all predictor variables found that several
-factors were statistically significant in predicting time to recovery
-from COVID-19. On average, having a history of former or current
-smoking, having hypertension, and experiencing severe COVID-19 infection
-were all significantly associated with a longer predicted recovery time.
-Additionally, being in study B was associated with a longer recovery
-time compared to being in study A. On the other hand, being male and
-being vaccinated was associated with a shorter recovery time. Finally,
-BMI, height, and weight are also significantly associated with predicted
-COVID-19 recovery time. The model did not find significant associations
-with race or diabetes. These insights can be useful in predicting
-recovery time and informing clinical decisions in the management of
-COVID-19 patients.
+The final GAM model found that several factors were statistically
+significant in predicting time to recovery from COVID-19. On average,
+having a history of former or current smoking, having hypertension, and
+experiencing severe COVID-19 infection were all significantly associated
+with a longer predicted recovery time. Additionally, being in study B
+was associated with a longer recovery time compared to being in study A.
+On the other hand, being male and being vaccinated was associated with a
+shorter recovery time. Finally, BMI, height, and weight are also
+significantly associated with predicted COVID-19 recovery time. The
+model did not find significant associations with race or diabetes. These
+insights can be useful in predicting recovery time and informing
+clinical decisions in the management of COVID-19 patients.
 
 # Appendix
 
@@ -902,8 +866,8 @@ Predictor plots for the final GAM model:
 ``` r
 set.seed(2183)
 
-# Formula based on final GAM model with all predictors (gam_model_all)
-gam_final_model <- gam(recovery_time ~ gender + race + + smoking + 
+# formula based on final GAM model
+gam_final_model <- gam(recovery_time ~ gender + race + smoking + 
                          hypertension + diabetes + vaccine + severity + study + 
                          s(age) + s(SBP) + s(LDL) + s(bmi) + s(height) + 
                          s(weight), 
@@ -912,4 +876,4 @@ gam_final_model <- gam(recovery_time ~ gender + race + + smoking +
 plot(gam_final_model)
 ```
 
-![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-15-2.png)<!-- -->![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-15-3.png)<!-- -->![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-15-4.png)<!-- -->![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-15-5.png)<!-- -->![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-15-6.png)<!-- -->
+![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-16-2.png)<!-- -->![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-16-3.png)<!-- -->![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-16-4.png)<!-- -->![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-16-5.png)<!-- -->![](p8106_midterm_sef2183_files/figure-gfm/unnamed-chunk-16-6.png)<!-- -->
