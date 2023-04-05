@@ -33,28 +33,23 @@ library(stargazer) # for creating a nice formatted table
 ```
 
 ```{r, include = FALSE}
-set.seed(2183) # for reproducibility - my UNI
-
 # read in dataset
 load("data/recovery.Rdata")
-
+set.seed(2183) # for reproducibility - my UNI
 # create a random sample of 2000 participants
 dat <- dat[sample(1:10000, 2000),] 
-
 # remove the id variable from the dataset
 dat <- dat %>%
   select(-id)
-
+set.seed(2183) # for reproducibility - my UNI
 # specify rows of training data (70% of the dataset)
 trRows <- createDataPartition(dat$recovery_time, p = 0.7, list = FALSE)
-
 # training data
 dat_train <- dat[trRows, ]
 ## matrix of predictors
 x <- model.matrix(recovery_time~.,dat)[trRows,-1]
 ## vector of response
 y <- dat$recovery_time[trRows]
-
 # test data
 dat_test <- dat[-trRows, ]
 ## matrix of predictors
@@ -75,13 +70,10 @@ dat_train_viz <- dat_train %>%
     study == "A" ~ 1,
     study == "B" ~ 2,
     study == "C" ~ 3))
-
 # Find the remaining non-numeric columns
 non_numeric_cols <- sapply(dat_train_viz, function(x) !is.numeric(x))
-
 # Convert non-numeric columns to numeric
 dat_train_viz[, non_numeric_cols] <- lapply(dat_train_viz[, non_numeric_cols], as.numeric) # turn factor variables into numeric variables
-
 # set various graphical parameters (color, line type, background, etc) to control the look of trellis displays
 theme1 <- trellis.par.get()
 theme1$plot.symbol$col <- rgb(.2, .4, .2, .5)
@@ -114,10 +106,9 @@ Several different models were fit using all predictors to predict time to recove
 A linear model that assumes a linear relationship between the predictor and response variables (linearity), and assumes that the errors are normally distributed (normality) and have constant variance (homoscedasticity),and that the observations are independent of each other (independence). The linear model is the most basic and assumes a linear relationship between the variables, while the other models allow for more flexible relationships. A method = "lm" argument was used within the `train()` function to specify a linear model fit.
 ```{r, include = FALSE}
 set.seed(2183)
-
 # 10-fold cross-validation repeated 5 times using the best rule
 ctrl <- trainControl(method = "repeatedcv", number = 10, repeats = 5)
-
+set.seed(2183)
 # Fit a linear regression model using cross-validation on the training dataset
 linear_model <- train(recovery_time ~ age + gender + race + smoking + height + 
                         weight + bmi + hypertension + diabetes + SBP + LDL + 
@@ -125,10 +116,8 @@ linear_model <- train(recovery_time ~ age + gender + race + smoking + height +
                data = dat_train, # training dataset
                method = "lm", 
                trControl = ctrl)
-
 # view the model summary and performance on the test set
 summary(linear_model$finalModel)
-
 # view performance on the test set (RMSE)
 test_pred <- predict(linear_model, newdata = dat_test) # test dataset
 test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
@@ -139,16 +128,13 @@ test_rmse
 A lasso model is a linear regression model that adds a penalty term to the sum of absolute values of the coefficients to prevent overfitting, which can lead to sparse models by shrinking some coefficients to zero. It has the same assumptions as the linear model. A method = "glmnet" argument was used within the `train()` function to specify a lasso model fit. Additionally, a grid of tuning parameters for the model were set using the tuneGrid argument within the `train()` function. The grid contains 100 values of the lambda parameter, ranging from exp(-1) to exp(5) with equal intervals on the log scale. The alpha parameter is set to 1, indicating that we are only considering Lasso regularization. The `expand.grid()` function is used to generate all possible combinations of alpha and lambda in the grid for tuning.
 ```{r, include = FALSE}
 set.seed(2183)
-
 lasso_model <- train(x, y, # training dataset
                    method = "glmnet",
                    tuneGrid = expand.grid(alpha = 1,
                                           lambda = exp(seq(-1, 5, length = 100))),
                    trControl = ctrl)
-
 # view the model summary
 summary(lasso_model$finalModel)
-
 # view performance on the test set (RMSE)
 test_pred <- predict(lasso_model, newdata = x2) # test dataset
 test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
@@ -159,16 +145,13 @@ test_rmse
 An elastic net model is linear regression model that combines the penalties of the lasso and ridge regression methods to prevent overfitting, which can result in better prediction accuracy than either method alone. It has the same assumptions as the linear model. A method = "glmnet" argument was used within the `train()` function to specify a elastic net model fit. Additionally, a grid of tuning parameters for the model were set using the tuneGrid argument within the `train()` function. The grid includes 21 values of the alpha parameter, ranging from 0 to 1 with equal intervals. The lambda parameter is set to a sequence of 50 values, ranging from exp(2) to exp(-2) with equal intervals on the log scale. The expand.grid() function generates all possible combinations of alpha and lambda in the grid for tuning.
 ```{r, include = FALSE}
 set.seed(2183)
-
 enet_model <- train(x, y, # training dataset
                   method = "glmnet",
                   tuneGrid = expand.grid(alpha = seq(0, 1, length = 21),
                                          lambda = exp(seq(2, -2, length = 50))),
                   trControl = ctrl)
-
 # view the model summary
 summary(enet_model$finalModel)
-
 # view performance on the test set (RMSE)
 test_pred <- predict(enet_model, newdata = x2) # test dataset
 test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
@@ -179,16 +162,13 @@ test_rmse
 A PLS model is a model that seeks to find a low-dimensional representation of the predictor variables that explains the maximum variance in the response variable. It has the same assumptions as the linear model as well as a latent variable assumption, the assumption that the predictor variables are linearly related to the response variable via a set of underlying latent variables. A method = "pls" argument was used within the `train()` function to specify a PLS model fit. Additionally, a tuning parameter for the model were set using the tuneGrid argument within the `train()` function. The tuneGrid object includes a data frame with a single column ncomp that ranges from 1 to 17, representing the number of components used in the model. The preProcess argument is set to "center" and "scale", which means that the training data will be centered and scaled prior to model fitting.
 ```{r, include = FALSE}
 set.seed(2183)
-
 pls_model <- train(x, y, # training dataset
                  method = "pls",
                  tuneGrid = data.frame(ncomp = 1:17),
                  trControl = ctrl,
                  preProcess = c("center", "scale"))
-
 # view the model summary
 summary(pls_model$finalModel)
-
 # view performance on the test set (RMSE)
 test_pred <- predict(pls_model, newdata = x2) # test dataset
 test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
@@ -196,36 +176,18 @@ test_rmse
 ```
 
 **5. Generalized additive model (GAM) model**
-A GAM model is a model that extends the linear model by allowing for nonlinear relationships between the predictor and response variables, using flexible functions called splines. It has the same assumptions as the linear model. A method = "gam" argument was used within the `train()` function to specify a GAM fit. Additionally, two separate GAM models were fit: one GAM model using all predictors, and one GAM model with variable selection performed during model training. For the variable selection GAM model, a tuneGrid object was specified within the `train()` function. The tuneGrid object includes a data frame with two arguments: method is set to "GCV.Cp", which represents the generalized cross-validation with the Cp criterion for smoothing parameter selection, and select is set to TRUE, indicating that variable selection will be performed during model training.
+A GAM model is a model that extends the linear model by allowing for nonlinear relationships between the predictor and response variables, using flexible functions called splines. It has the same assumptions as the linear model. A method = "gam" argument was used within the `train()` function to specify a GAM fit. 
 ```{r, include = FALSE}
 set.seed(2183)
-
-# fit GAM model using all predictors
-gam_model_all <- train(x, y,# training dataset
+# fit GAM model using
+gam_model <- train(x, y,# training dataset
                  method = "gam",
                  trControl = ctrl,
                  control = gam.control(maxit = 200)) # Adjusted due to failure to converge at default setting
-
 # view the model summary
-summary(gam_model_all$finalModel)
-
-# fit GAM model using selection specification
-gam_model_select <- train(x, y, # training dataset
-                 method = "gam",
-                 tuneGrid = data.frame(method = "GCV.Cp", select = c(TRUE)),
-                 trControl = ctrl, # 10-fold CV
-                 control = gam.control(maxit = 200))  # Adjusted due to failure to converge at default setting
-
-# view the model summary
-summary(gam_model_select$finalModel)
-
-# view performance on the test set (RMSE) for the model with all predictors
-test_pred <- predict(gam_model_all, newdata = x2) # test dataset
-test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
-test_rmse
-
-# view performance on the test set (RMSE) for the model with select predictors
-test_pred <- predict(gam_model_select, newdata = x2) # test dataset
+summary(gam_model$finalModel)
+# view performance on the test set (RMSE)
+test_pred <- predict(gam_model, newdata = x2) # test dataset
 test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
 test_rmse
 ```
@@ -233,52 +195,78 @@ test_rmse
 **6. Multivariate adaptive regression spline (MARS) model**
 A MARS model is a model that uses piecewise linear or nonlinear functions to model the relationship between the predictor and response variables, which can capture complex nonlinear relationships. It has the same assumptions as the linear model. A method = "earth" argument was used within the `train()` function to specify a MARS model fit. Additionally, the `expand.grid()` function is used to generate a grid of tuning parameters. The mars_grid object includes two arguments: degree is set to 1, 2, and 3, representing the number of possible product hinge functions in a single term, and nprune is set to integers between 2 and 17, representing the upper bound on the number of terms in the model. The tuneGrid argument in the `train()` function uses the mars_grid object to specify the parameters for model tuning.
 ```{r, include = FALSE}
-set.seed(2183)
+# create dummy variables for categorical variables
+df_dummies <- data.frame(model.matrix(~ . - 1, data = dat[, c("gender", "race", "smoking", "hypertension", "diabetes", "vaccine", "severity", "study")]), # exclude ID and continuous variables
+                         age = dat$age,
+                         height = dat$height,
+                         weight = dat$weight,
+                         bmi = dat$bmi,
+                         SBP = dat$SBP,
+                         LDL = dat$LDL,
+                         recovery_time = dat$recovery_time) # add continuous variables back to the data frame
 
+# rename df_dummies dataset as dat
+dat_mars <- df_dummies
+
+# training data
+dat_train_mars <- dat_mars[trRows, ]
+## matrix of predictors
+x_mars <- model.matrix(recovery_time~.,dat_mars)[trRows,-1]
+## vector of response
+y_mars <- dat_mars$recovery_time[trRows]
+
+# test data
+dat_test_mars <- dat_mars[-trRows, ]
+## matrix of predictors
+x2_mars <- model.matrix(recovery_time~.,dat_mars)[-trRows,-1]
+## vector of response
+y2_mars <- dat_mars$recovery_time[-trRows]
+```
+
+```{r, include = FALSE}
 # create grid of all possible pairs that can take degree and nprune values
 mars_grid <- expand.grid(degree = 1:3, # number of possible product hinge functions in 1 term
-                         nprune = 2:17) # Upper bound of number of terms in model
-
-mars_model <- train(x, y, # training dataset
+                         nprune = 2:17) # upper bound of number of terms in model
+set.seed(2183)
+mars_model <- train(x_mars, y_mars, # training dataset
                   method = "earth",
                   tuneGrid = mars_grid,
                   trControl = ctrl)
-
-# view the model summary
+# view the model cross-validation (tuning parameter selection) plot and summary
+print(plot(mars_model))
 summary(mars_model$finalModel)
-
 # view performance on the test set (RMSE)
-test_pred <- predict(mars_model, newdata = x2) # test dataset
-test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
+test_pred <- predict(mars_model, newdata = x2_mars) # test dataset
+test_rmse <- sqrt(mean((test_pred - dat_test_mars$recovery_time)^2))
 test_rmse
 ```
 
-
-The final model was selected by comparing the median training RMSE for all models (Figure 2 in the appendix). The lasso model had the highest mean and median training RMSE (i.e., worst performance), and the MARS model had the lowest mean and median training RMSE (i.e., best performance). However, the MARS model only contained 4 terms with 2 of the predictors, so it was not an ideal model for comprehensively identifying important risk factors for recovery time, as so few risk factors were included. Therefore, the GAM model will all predictors--the second best model in terms of mean and median RMSE--was selected as the final model in this study.
+The final model was selected by comparing the median training RMSE for all models (Figure 2 in the appendix). The pls model had the highest median training RMSE (i.e., worst performance), and the MARS model had the lowest median training RMSE (i.e., best performance). However, the MARS model only contained 4 of the predictors, so it was not an ideal model for comprehensively identifying important risk factors for recovery time, as so few risk factors were included. Therefore, the GAM model--the second best model in terms of mean and median RMSE--was selected as the final model in this study.
 
 # Results
 The final GAM model formula uses the `recovery_time` variable as the outcome, and all predictors in the dataset. Dummy variables were created for the patient race variable with "White" set as the reference category, the smoking variable with "Never Smoker" set as the reference category, and the study variable with "Study A" set as the reference category. Additionally, a smoothing function was applied to the numeric predictors (patient age, SBP, LDL cholesterol, BMI, height, and weight)
 
-**Model interpretation:** Significant predictors of COVID-19 recovery time at the 5% level of significance include gender, smoking history, hypertension, vaccination status, infection severity, and study group. The GAM model also identified significant nonlinear relationships between BMI, weight, and height and predicted recovery time. On average: 
+**Model interpretation:** Significant predictors of COVID-19 recovery time at the 5% level of significance include gender, smoking history, hypertension, vaccination status, infection severity, and study group. The GAM model also identified significant nonlinear relationships between age, BMI, weight, and height and predicted recovery time. On average: 
 
-- Being male is associated with a 5.3039-day shorter predicted recovery time than being female. 
-- Being a former smoker is associated with a 4.6506-day longer predicted recovery time than never smoking.
-- Being a current smoker is associated with a 8.0189-day longer predicted recovery time than never smoking.
-- having hypertension is associated with a 5.2189-day longer predicted recovery time than no hypertension diagnosis.
-- Being vaccinated is associated with a 8.0292-day shorter predicted recovery time than no vaccination.
-- severe COVID-19 infection is associated with a 9.5517-day longer predicted recovery time than non severe.
-- Being in study B is associated with 4.2897-day longer predicted recovery time than being in study A.
+- Being male is associated with a 7.51837-day shorter predicted recovery time than being female. 
+- Being a former smoker is associated with a 4.64945-day longer predicted recovery time than never smoking.
+- Being a current smoker is associated with a 8.73771-day longer predicted recovery time than never smoking.
+- having hypertension is associated with a 4.43411-day longer predicted recovery time than no hypertension diagnosis.
+- Being vaccinated is associated with a 7.80343-day shorter predicted recovery time than no vaccination.
+- severe COVID-19 infection is associated with a 6.61473-day longer predicted recovery time than non severe.
+- Being in study B is associated with 4.44936-day longer predicted recovery time than being in study A.
 
 ```{r, include = FALSE}
 set.seed(2183)
 
 # calculate and print the GAM model test RMSE
-test_pred <- predict(gam_model_all, newdata = x2)
+test_pred <- predict(gam_model, newdata = x2)
 test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
 test_rmse
 ```
 
-**Model performance:** All of these factors together explain 43.8% of the deviance in COVID-19 recovery time. Additionally, the model's training error of 24.4 indicates that, on average, the model's predictions on the training data deviate from the actual values by 24.4 units. Meanwhile, the test error of 23.8 (see appendix) suggests that the model's performance on unseen data is slightly better than its performance on the training data. This indicates that the model generalizes well to new data. 
+**Model performance:** All of these factors together explain 44.2% of the deviance in COVID-19 recovery time. Additionally, themodel’s training error (RMSE using the training dataset) of about 24.0 (rounded) indicates that, on average,the model’s predictions on the training data deviate from the actual values by 24 units. Meanwhile, thetest error (RMSE using the test dataset) of 25.5 (rounded) suggests that the model’s performance on unseendata is slightly worse than its performance on the training data.18
+
 
 # Conclusion
 The final GAM model using all predictor variables found that several factors were statistically significant in predicting time to recovery from COVID-19. On average, having a history of former or current smoking, having hypertension, and experiencing severe COVID-19 infection were all significantly associated with a longer predicted recovery time. Additionally, being in study B was associated with a longer recovery time compared to being in study A. On the other hand, being male and being vaccinated was associated with a shorter recovery time. Finally, BMI, height, and weight are also significantly associated with predicted COVID-19 recovery time. The model did not find significant associations with race or diabetes. These insights can be useful in predicting recovery time and informing clinical decisions in the management of COVID-19 patients.
@@ -298,17 +286,14 @@ featurePlot(x = dat_train_viz[ ,1:14],
 
 ```{r,  echo = FALSE, results = TRUE}
 set.seed(2183)
-
 resamp <- resamples(list(
   lm = linear_model,
   lasso = lasso_model,
   enet = enet_model,
   pls = pls_model,
-  gam_all = gam_model_all,
-  gam_select = gam_model_select,
+  gam = gam_model,
   mars = mars_model
   ))
-
 bwplot(resamp, 
        metric = "RMSE",
        main = "Figure 2. Model Comparison Plot Using RMSE")
