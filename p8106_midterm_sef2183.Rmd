@@ -2,8 +2,24 @@
 title: "P8106 Data Science II Midterm Project Code: Predicting COVID-19 Recovery Time and Identifying Important Risk Factors"
 author: "Sarah Forrest - sef2183"
 date: "4/5/2023"
-output: github_document
+output: 
+  pdf_document:
+    toc: yes
+    toc_depth: 2
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: '2'
+header-includes:
+- \usepackage{fancyhdr}
+- \usepackage{lipsum}
+- \pagestyle{fancy}
+- \fancyhead[R]{\thepage}
+- \fancypagestyle{plain}{\pagestyle{fancy}}
 --- 
+
+\newpage
+
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, echo = TRUE, message = FALSE, warning = FALSE, dpi = 300, fig.width = 7)
@@ -398,7 +414,7 @@ All of these factors together explain 44.2% of the deviance in COVID-19 recovery
 
 # Conclusion
 
-The final GAM model found that several factors were statistically significant in predicting time to recovery from COVID-19. On average, having a history of former or current smoking, having hypertension, and experiencing severe COVID-19 infection were all significantly associated with a longer predicted recovery time. Additionally, being in study B was associated with a longer recovery time compared to being in study A. On the other hand, being male and being vaccinated was associated with a shorter recovery time. Finally, BMI, height, and weight are also significantly associated with predicted COVID-19 recovery time. The model did not find significant associations with race or diabetes. These insights can be useful in predicting recovery time and informing clinical decisions in the management of COVID-19 patients.
+The final GAM model found that several factors were statistically significant in predicting time to recovery from COVID-19. On average, having a history of former or current smoking, having hypertension, and experiencing severe COVID-19 infection were all significantly associated with a longer predicted recovery time. Additionally, being in study B was associated with a longer recovery time compared to being in study A. On the other hand, being male and being vaccinated was associated with a shorter recovery time. Finally, age, BMI, height, and weight are also significantly associated with predicted COVID-19 recovery time. The model did not find significant associations with race or diabetes. These insights can be useful in predicting recovery time and informing clinical decisions in the management of COVID-19 patients.
 
 
 # Appendix

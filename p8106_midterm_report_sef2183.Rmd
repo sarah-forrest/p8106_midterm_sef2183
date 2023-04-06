@@ -246,14 +246,16 @@ The final model was selected by comparing the median training RMSE for all model
 # Results
 The final GAM model formula uses the `recovery_time` variable as the outcome, and all predictors in the dataset. Dummy variables were created for the patient race variable with "White" set as the reference category, the smoking variable with "Never Smoker" set as the reference category, and the study variable with "Study A" set as the reference category. Additionally, a smoothing function was applied to the numeric predictors (patient age, SBP, LDL cholesterol, BMI, height, and weight)
 
-**Model interpretation:** Significant predictors of COVID-19 recovery time at the 5% level of significance include gender, smoking history, hypertension, vaccination status, infection severity, and study group. The GAM model also identified significant nonlinear relationships between age, BMI, weight, and height and predicted recovery time. On average: 
+**Model interpretation:** Significant predictors of COVID-19 recovery time at the 5% level of significance include gender, smoking history, hypertension, vaccination status, infection severity, and study group. The GAM model also identified significant nonlinear relationships between age, BMI, weight, and height and predicted recovery time. 
+
+On average: 
 
 - Being male is associated with a 7.51837-day shorter predicted recovery time than being female. 
 - Being a former smoker is associated with a 4.64945-day longer predicted recovery time than never smoking.
 - Being a current smoker is associated with a 8.73771-day longer predicted recovery time than never smoking.
 - having hypertension is associated with a 4.43411-day longer predicted recovery time than no hypertension diagnosis.
 - Being vaccinated is associated with a 7.80343-day shorter predicted recovery time than no vaccination.
-- severe COVID-19 infection is associated with a 6.61473-day longer predicted recovery time than non severe.
+- Severe COVID-19 infection is associated with a 6.61473-day longer predicted recovery time than non severe.
 - Being in study B is associated with 4.44936-day longer predicted recovery time than being in study A.
 
 ```{r, include = FALSE}
@@ -265,11 +267,11 @@ test_rmse <- sqrt(mean((test_pred - dat_test$recovery_time)^2))
 test_rmse
 ```
 
-**Model performance:** All of these factors together explain 44.2% of the deviance in COVID-19 recovery time. Additionally, themodel’s training error (RMSE using the training dataset) of about 24.0 (rounded) indicates that, on average,the model’s predictions on the training data deviate from the actual values by 24 units. Meanwhile, thetest error (RMSE using the test dataset) of 25.5 (rounded) suggests that the model’s performance on unseendata is slightly worse than its performance on the training data.18
+**Model performance:** All of these factors together explain 44.2% of the deviance in COVID-19 recovery time. Additionally, themodel’s training error (RMSE using the training dataset) of about 24.0 (rounded) indicates that, on average,the model’s predictions on the training data deviate from the actual values by 24 units. Meanwhile, the test error (RMSE using the test dataset) of 25.5 (rounded) suggests that the model’s performance on unseen data is slightly worse than its performance on the training data.
 
 
 # Conclusion
-The final GAM model using all predictor variables found that several factors were statistically significant in predicting time to recovery from COVID-19. On average, having a history of former or current smoking, having hypertension, and experiencing severe COVID-19 infection were all significantly associated with a longer predicted recovery time. Additionally, being in study B was associated with a longer recovery time compared to being in study A. On the other hand, being male and being vaccinated was associated with a shorter recovery time. Finally, BMI, height, and weight are also significantly associated with predicted COVID-19 recovery time. The model did not find significant associations with race or diabetes. These insights can be useful in predicting recovery time and informing clinical decisions in the management of COVID-19 patients.
+The final GAM model using all predictor variables found that several factors were statistically significant in predicting time to recovery from COVID-19. On average, having a history of former or current smoking, having hypertension, and experiencing severe COVID-19 infection were all significantly associated with a longer predicted recovery time. Additionally, being in study B was associated with a longer recovery time compared to being in study A. On the other hand, being male and being vaccinated was associated with a shorter recovery time. Finally, age, BMI, height, and weight are also significantly associated with predicted COVID-19 recovery time. The model did not find significant associations with race or diabetes. These insights can be useful in predicting recovery time and informing clinical decisions in the management of COVID-19 patients.
 
 \newpage
 
