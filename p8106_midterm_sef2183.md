@@ -853,7 +853,7 @@ experiencing severe COVID-19 infection were all significantly associated
 with a longer predicted recovery time. Additionally, being in study B
 was associated with a longer recovery time compared to being in study A.
 On the other hand, being male and being vaccinated was associated with a
-shorter recovery time. Finally, BMI, height, and weight are also
+shorter recovery time. Finally, age, BMI, height, and weight are also
 significantly associated with predicted COVID-19 recovery time. The
 model did not find significant associations with race or diabetes. These
 insights can be useful in predicting recovery time and informing
